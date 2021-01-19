@@ -1,5 +1,3 @@
 # starter_folder
 
-This repo....
-
-It is organised as follows...
+This will be a repo for my coffee project
