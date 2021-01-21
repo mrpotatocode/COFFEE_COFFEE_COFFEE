@@ -2,4 +2,4 @@
 
 Wait, that's not true at all.
 
-This will be a repo for my coffee project.
+This ~~will be~~ is a repo for my coffee project.
