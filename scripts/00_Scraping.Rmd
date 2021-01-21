@@ -1,0 +1,165 @@
+---
+title: "Scraping"
+author: "Thomas Rosenthal"
+date: "14/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+read in the libraries
+```{r warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(stringr)
+```
+
+
+
+
+get the data
+```{r}
+#run line first
+#then save (block 2)
+#then read in block 2 saved data as read html
+
+#raw_data <- read_html("https://eightouncecoffee.ca/collections/the-library-specialty-coffee")
+raw_data <- read_html("EightOunce/TLS.html")
+
+Roaster <- tibble("https://eightouncecoffee.ca/collections/the-library-specialty-coffee") %>% 
+  separate(1, into = c("1","Roaster"), sep = "collections/",  remove = TRUE) %>% 
+  select(-1) %>% 
+  sapply(gsub, pattern = "-", replacement = " ", fixed = TRUE) %>% 
+  tools::toTitleCase()
+```
+
+save the data
+```{r}
+#you'll have to create the folders
+#write_html(raw_data,"EightOunce/TLS.html")
+```
+
+look at the text
+```{r}
+slightly_cleaned_data <- 
+raw_data %>% 
+  html_nodes("body") %>% 
+  html_nodes("a") %>% 
+  #html_nodes("li") %>% 
+  html_text()
+```
+
+deal with the character vector
+```{r}
+our_data <- 
+tibble(raw_text = slightly_cleaned_data)
+```
+
+
+parse, focus on the blank line string:
+```{r}
+library(data.table)
+our_data <- our_data %>% 
+  mutate(is_TLS = if_else(raw_text %like% "\n\n\n\n\n\n\n ",1,0)) %>% 
+  filter(is_TLS == 1) 
+```
+
+just get the coffee name
+```{r}
+coffee_names <- our_data %>% 
+  separate(raw_text, into = c("1","2","3","4","5","6","7","Name"), sep = "\\n",  remove = TRUE) %>% 
+  select(Name) %>%
+  mutate(lower_name =  str_to_lower(Name)) %>% 
+  mutate(is_blend = if_else(lower_name %like% "blend",1,0)) %>% 
+  filter(is_blend != 1) %>% 
+  select(-is_blend)
+coffee_names
+```
+
+covert to hypenated words (e.g. 'the-library-specialty-coffee-ethiopia-chelelektu-washed')
+```{r}
+our_data <- coffee_names %>% select(lower_name) %>% 
+  apply( MARGIN = 2, FUN = trimws) %>% 
+  sapply(gsub, pattern = " ", replacement = "-", fixed = TRUE) %>% 
+  sapply(gsub, pattern = ",", replacement = "", fixed = TRUE) %>%
+  sapply(gsub, pattern = "---", replacement = "-", fixed = TRUE) %>%
+  as.data.frame() %>% 
+  rename(Hypen_Name = 1)
+our_data
+```
+
+add prefix: 'https://eightouncecoffee.ca/collections/the-library-specialty-coffee/products/'
+```{r}
+URLs <- paste0("https://eightouncecoffee.ca/collections/the-library-specialty-coffee/products/",our_data[,1])
+```
+
+create table for each coffee from URLs
+```{r}
+coffee_table <- data.frame()
+
+for(i in URLs){
+  coffee_row <- read_html(i)
+  
+  #dig into body table
+  slightly_cleaned_coffee <- 
+  coffee_row %>% 
+    html_nodes("body") %>% 
+    html_nodes("div") %>% 
+    html_nodes("div") %>% 
+    html_nodes("main") %>% 
+    html_nodes("div") %>% 
+    html_nodes("div") %>% 
+    html_nodes("div") %>%
+    html_nodes("div") %>%
+    html_nodes("div") %>%
+    html_nodes("main-tabs") %>%
+    html_nodes("div") %>%
+    html_nodes("ul") %>%
+    html_nodes("li") %>%
+    html_nodes("p") %>%
+    html_text()
+  
+  #deal with the character vector
+  coffee <- 
+  tibble(raw_text = slightly_cleaned_coffee)
+  
+  #seperate details row into relevent columns
+  coffee <- coffee %>%
+    pivot_wider(names_from = 1, values_from = raw_text) %>% 
+    rename(table = 1) %>%   #, detail1 = 2, detail2 = 3, detail3 = 4, detail4 = 5 -- some investigation into how to make this dynamic?
+    separate(table, into = c("1","Region","Variety","Processing","Altitude","TastingNotes"), sep = "\\w+:",  remove = TRUE) %>% 
+    select("Region","Variety","Processing","Altitude","TastingNotes") 
+  
+  for (i in nrow(coffee)) {
+      coffee_table <- rbind(coffee_table, data.frame(coffee))
+      }
+}
+```
+
+```{r}
+coffee_table
+```
+
+```{r}
+coffee_names <- coffee_names %>% 
+  separate(Name, into = c("Roaster","CoffeeName"), sep = "The Library Specialty Coffee ",  remove = TRUE)
+```
+
+```{r}
+coffee_names$Roaster <-Roaster
+
+newCoffeeName <- coffee_names %>% select(CoffeeName) %>% 
+  sapply(gsub, pattern = "-", replacement = "", fixed = TRUE) %>% 
+  apply( MARGIN = 2, FUN = trimws) %>% 
+  as.data.frame()
+
+coffee_names$CoffeeName = newCoffeeName[,1]
+coffee_names <- coffee_names %>% select(-lower_name)
+
+merge(coffee_names, coffee_table, by=0, all=TRUE)
+
+```
+
