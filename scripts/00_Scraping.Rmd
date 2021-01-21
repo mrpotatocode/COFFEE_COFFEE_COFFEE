@@ -17,29 +17,36 @@ library(lubridate)
 library(stringr)
 ```
 
+```{r "setup", include=FALSE}
+knitr::opts_knit$set(root.dir  = '..')
+```
 
 
+```{r}
+rundate = toString(sapply(date(now()), gsub, pattern = "-", replacement = "", fixed = TRUE))
+```
 
-get the data
+get and save data
 ```{r}
 #run line first
 #then save (block 2)
-#then read in block 2 saved data as read html
+#then comment out
 
-#raw_data <- read_html("https://eightouncecoffee.ca/collections/the-library-specialty-coffee")
-raw_data <- read_html("EightOunce/TLS.html")
 
-Roaster <- tibble("https://eightouncecoffee.ca/collections/the-library-specialty-coffee") %>% 
+
+raw_data <- read_html("https://eightouncecoffee.ca/collections/the-library-specialty-coffee")
+write_html(raw_data,paste0("inputs/data/EightOunce/TLS_" ,rundate, ".html"))
+```
+
+```{r}
+
+raw_data <- read_html(paste0("inputs/data/EightOunce/TLS_" ,rundate, ".html"))
+
+Roaster <- tibble(raw_data) %>% 
   separate(1, into = c("1","Roaster"), sep = "collections/",  remove = TRUE) %>% 
   select(-1) %>% 
   sapply(gsub, pattern = "-", replacement = " ", fixed = TRUE) %>% 
   tools::toTitleCase()
-```
-
-save the data
-```{r}
-#you'll have to create the folders
-#write_html(raw_data,"EightOunce/TLS.html")
 ```
 
 look at the text
@@ -70,7 +77,7 @@ our_data <- our_data %>%
 just get the coffee name
 ```{r}
 coffee_names <- our_data %>% 
-  separate(raw_text, into = c("1","2","3","4","5","6","7","Name"), sep = "\\n",  remove = TRUE) %>% 
+  separate(raw_text, into = c("1","2","3","4","5","6","7","8","9","Name"), sep = "\\n",  remove = TRUE)  %>% 
   select(Name) %>%
   mutate(lower_name =  str_to_lower(Name)) %>% 
   mutate(is_blend = if_else(lower_name %like% "blend",1,0)) %>% 
@@ -94,6 +101,10 @@ our_data
 add prefix: 'https://eightouncecoffee.ca/collections/the-library-specialty-coffee/products/'
 ```{r}
 URLs <- paste0("https://eightouncecoffee.ca/collections/the-library-specialty-coffee/products/",our_data[,1])
+```
+
+```{r}
+our_data
 ```
 
 create table for each coffee from URLs
