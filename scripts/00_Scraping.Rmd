@@ -42,7 +42,7 @@ write_html(raw_data,paste0("inputs/data/EightOunce/TLS_" ,rundate, ".html"))
 
 raw_data <- read_html(paste0("inputs/data/EightOunce/TLS_" ,rundate, ".html"))
 
-Roaster <- tibble(raw_data) %>% 
+Roaster <- tibble("https://eightouncecoffee.ca/collections/the-library-specialty-coffee") %>% 
   separate(1, into = c("1","Roaster"), sep = "collections/",  remove = TRUE) %>% 
   select(-1) %>% 
   sapply(gsub, pattern = "-", replacement = " ", fixed = TRUE) %>% 
@@ -156,7 +156,8 @@ coffee_table
 
 ```{r}
 coffee_names <- coffee_names %>% 
-  separate(Name, into = c("Roaster","CoffeeName"), sep = "The Library Specialty Coffee ",  remove = TRUE)
+  separate(Name, into = c("Roaster","CoffeeName"), sep = case_when("Name" %like% "The Library Specialty Coffee " ~ "The Library Specialty Coffee ",
+                                                                   TRUE ~ "The Library "), remove = TRUE)
 ```
 
 ```{r}
@@ -170,7 +171,15 @@ newCoffeeName <- coffee_names %>% select(CoffeeName) %>%
 coffee_names$CoffeeName = newCoffeeName[,1]
 coffee_names <- coffee_names %>% select(-lower_name)
 
-merge(coffee_names, coffee_table, by=0, all=TRUE)
+final <- merge(coffee_names, coffee_table, by=0, all=TRUE)
+final
+```
+write to csv
+```{r}
+path_out = paste0(getwd(),'/outputs/')
 
+file_name = paste0(path_out, 'EightOunce_TLS_',rundate,".csv")
+
+write_csv(final,file_name)
 ```
 
