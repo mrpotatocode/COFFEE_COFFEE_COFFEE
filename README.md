@@ -1,3 +1,5 @@
-# starter_folder
+# EVERYTHING THAT STARTS GETS FINISHED
 
-This will be a repo for my coffee project
+Wait, that's not true at all.
+
+This will be a repo for my coffee project.
