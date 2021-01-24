@@ -369,10 +369,46 @@ summary {
 </div>
 
 
+<div id="literature" class="section level3">
+<h3>Literature</h3>
+<p>Reading through <a href="https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml">Shapiro</a>, a few thoughts arise.</p>
+<ul>
+<li>What automation options exist for this project?
+<ul>
+<li>Firstly, data collection. I really need that to be independent from me. In reality, I need a year’s worth of data. I’m going to get 3 months worth. A successful project will let me rerun analysis 9 months later without having done a whole lot.</li>
+<li>Secondly, save files? Save tables? Save everything? Interesting. Coming from SQL, we often create _LAND tables, write, run, and schedule a stored procedure to create a _STAGE table and write another stored procure to build the reporting features. So three scripts (usually a basic pull to create the _LAND table from a dir, and the two SPs) and two tables does most of the work. In this project, I don’t think it’ll be that simple. Just from the onset, it appears every week’s worth of raw data for EACH roaster will be one file. Why wouldn’t I also make a combined table down the road, rather than reload and recombine all the time. Hmmm…I will have to think about this.</li>
+</ul></li>
+<li>Version Control
+<ul>
+<li>Well, better get better at GITHUB…</li>
+<li>One thing I think they should have also pointed out with the _firstinitiallastinitial (_TR) method is that people leave orgs/projects. Nothing like random names popping up six years later.<br />
+</li>
+</ul></li>
+<li>Normalize, Abstraction
+<ul>
+<li>It’s interesting – I think normalization is super useful as things scale. But in small projects, it creates a huge amount of wasted overhead. I’ve been debating how much I will normalize for this project</li>
+<li>Same thing with abstraction, but for different reasoning…I’m not great at writing functions in R. Oh, in that case, this is a bad excuse. Okay, let’s find space for it in here.</li>
+</ul></li>
+<li>Documentation
+<ul>
+<li>Great story with the light switch. Just keep people from running code that will break, rather than marking “don’t do this”.</li>
+</ul></li>
+</ul>
+</div>
 <div id="shiny-functionality" class="section level3">
 <h3>Shiny Functionality</h3>
 <p>I’ve spent most of this week playing around with some of the basic functionality of Shiny.</p>
-<p>In <em>Mastering Shiny</em>, Wickham lays out the “Getting Started” section into three categories: - The basics: to help get us going with Shiny - the simplest possible <code>hello world</code> app - a few simple plots, some sliders and other input formats - and an overview of Shiny’s general capabilities. - Some structural UI necessities: to help get a feel for laying out the app. - Reactivity: to help to lay the foundation for <em>how</em> shiny works, at least from a purely functional perspective</p>
+<p>In <em>Mastering Shiny</em>, Wickham lays out the “Getting Started” section into three categories:</p>
+<ul>
+<li>The basics: to help get us going with Shiny
+<ul>
+<li>the simplest possible <code>hello world</code> app</li>
+<li>a few simple plots, some sliders and other input formats</li>
+<li>and an overview of Shiny’s general capabilities.</li>
+</ul></li>
+<li>Some structural UI necessities: to help get a feel for laying out the app.</li>
+<li>Reactivity: to help to lay the foundation for <em>how</em> shiny works, at least from a purely functional perspective</li>
+</ul>
 <p>I did this chapter after building the <a href="https://shiny.rstudio.com/articles/build.html">mpg app</a>, where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually. My version of this app (though it’s 99% the same) is <a href="https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/First">here</a>.</p>
 </div>
 <div id="exercises" class="section level3">

@@ -11,10 +11,27 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir  = '../..')
 ```
 
+### Literature
+Reading through [Shapiro](https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml), a few thoughts arise. 
+
+- What automation options exist for this project?
+    - Firstly, data collection. I really need that to be independent from me. In reality, I need a year's worth of data. I'm going to get 3 months worth. A successful project will let me rerun analysis 9 months later without having done a whole lot. 
+    - Secondly, save files? Save tables? Save everything? Interesting. Coming from SQL, we often create _LAND tables, write, run, and schedule a stored procedure to create a _STAGE table and write another stored procure to build the reporting features. So three scripts (usually a basic pull to create the _LAND table from a dir, and the two SPs) and two tables does most of the work. In this project, I don't think it'll be that simple. Just from the onset, it appears every week's worth of raw data for EACH roaster will be one file. Why wouldn't I also make a combined table down the road, rather than reload and recombine all the time. Hmmm...I will have to think about this.
+- Version Control
+    - Well, better get better at GITHUB...
+    - One thing I think they should have also pointed out with the _firstinitiallastinitial (_TR) method is that people leave orgs/projects. Nothing like random names popping up six years later.    
+- Normalize, Abstraction
+    - It's interesting -- I think normalization is super useful as things scale. But in small projects, it creates a huge amount of wasted overhead. I've been debating how much I will normalize for this project
+    - Same thing with abstraction,  but for different reasoning...I'm not great at writing functions in R. Oh, in that case, this is a bad excuse. Okay, let's find space for it in here.
+- Documentation
+    - Great story with the light switch. Just keep people from running code that will break, rather than marking "don't do this". 
+    
+
 ### Shiny Functionality
 I've spent most of this week playing around with some of the basic functionality of Shiny. 
 
 In _Mastering Shiny_, Wickham lays out the "Getting Started" section into three categories:
+
 - The basics: to help get us going with Shiny
     - the simplest possible ```hello world``` app
     - a few simple plots, some sliders and other input formats 
