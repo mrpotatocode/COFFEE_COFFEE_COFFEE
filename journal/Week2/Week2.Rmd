@@ -8,7 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir  = '..')
+knitr::opts_knit$set(root.dir  = '../..')
 ```
 
 ### Shiny Functionality
@@ -22,7 +22,7 @@ In _Mastering Shiny_, Wickham lays out the "Getting Started" section into three 
 - Some structural UI necessities: to help get a feel for laying out the app.
 - Reactivity: to help to lay the foundation for _how_ shiny works, at least from a purely functional perspective
 
-I did this chapter after building the [mpg app](https://shiny.rstudio.com/articles/build.html), where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually.
+I did this chapter after building the [mpg app](https://shiny.rstudio.com/articles/build.html), where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually. My version of this app (though it's 99% the same) is [here](https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/First). 
 
 ### Exercises
 

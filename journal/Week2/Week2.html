@@ -373,7 +373,7 @@ summary {
 <h3>Shiny Functionality</h3>
 <p>I’ve spent most of this week playing around with some of the basic functionality of Shiny.</p>
 <p>In <em>Mastering Shiny</em>, Wickham lays out the “Getting Started” section into three categories: - The basics: to help get us going with Shiny - the simplest possible <code>hello world</code> app - a few simple plots, some sliders and other input formats - and an overview of Shiny’s general capabilities. - Some structural UI necessities: to help get a feel for laying out the app. - Reactivity: to help to lay the foundation for <em>how</em> shiny works, at least from a purely functional perspective</p>
-<p>I did this chapter after building the <a href="https://shiny.rstudio.com/articles/build.html">mpg app</a>, where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually.</p>
+<p>I did this chapter after building the <a href="https://shiny.rstudio.com/articles/build.html">mpg app</a>, where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually. My version of this app (though it’s 99% the same) is <a href="https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/First">here</a>.</p>
 </div>
 <div id="exercises" class="section level3">
 <h3>Exercises</h3>
@@ -630,7 +630,6 @@ server &lt;- function(input, output, session) {
 shinyApp(ui = ui, server = server)</code></pre>
 <div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
 <p>Feeling fairly confident, I read through <a href="https://mastering-shiny.org/basic-reactivity.html">Chapter 4</a> and proceeded to the case study in <a href="https://mastering-shiny.org/basic-case-study.html#exercises-5">Chapter 5</a>.</p>
-<p>See the code <a href="https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/blob/main/Tamatoa/Exercises/Chapter5/5.8app.R">here</a>, it doesn’t want to work with knitting.</p>
 <pre class="r"><code>library(shiny)
 library(vroom)</code></pre>
 <pre><code>## Warning: package 'vroom' was built under R version 3.6.2</code></pre>
@@ -778,8 +777,8 @@ shinyApp(ui = ui, server = server)</code></pre>
 <div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
 <p>Needless to say, wow, there is a lot to make these things interesting and intelligent. I’m glad to play with Wickham’s more established Shiny app, but also reminded that it’s going to be a long road.</p>
 </div>
-<div id="week-reflection" class="section level3">
-<h3>Week Reflection</h3>
+<div id="week-reflection-coffee-project" class="section level3">
+<h3>Week Reflection, Coffee Project</h3>
 <p>Things are going well overall. I’ve been using Eight Ounce Coffee’s (website)[<a href="https://eightouncecoffee.ca/" class="uri">https://eightouncecoffee.ca/</a>] to start some scraping. My first week’s scraper worked well, but wasn’t rerunable in the second week. It seems there will be inconsitencies in the precise way they upload bags to the website – mostly based on the number leading /n characters in the <code>html_node</code> character string. These /n characters are used as splitting mechanisms to grab the coffee name, rewrite it as a hypenated string, and then pushed into a for loop with <code>read_html</code>. These individual hyperlinks to pull in the coffee details. When the data comes in, it’s a bit messy, and it looks like some weeks will have more details available than others. I will have to build something flexible enough to properly write each metric to the appropriate column. Unlike last week, I wrote this week’s coffee to a csv when it’s all said and done so I don’t have to rerun the HTML files again. Stuff gets taken down very quickly, as you’d expect. Once a week seems good though (having actually popped into The Library Specialty Coffee this week, their shelf mirrors Eight Ounce’s website.) It shouldn’t take long to grab a lot more roasters and use the same methodology. The resuling csv should be about 5 coffees per roaster, per week (maybe slower for some of the smaller roasters), so we’ll have close to 100 coffees a week scraped off Eight Ounce. That’s really nice.</p>
 </div>
 
