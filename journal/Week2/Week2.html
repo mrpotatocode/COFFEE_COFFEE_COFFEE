@@ -369,8 +369,8 @@ summary {
 </div>
 
 
-<div id="literature" class="section level3">
-<h3>Literature</h3>
+<div id="literature" class="section level2">
+<h2>Literature</h2>
 <p>Reading through <a href="https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml">Shapiro</a>, a few thoughts arise.</p>
 <ul>
 <li>What automation options exist for this project?
@@ -395,9 +395,9 @@ summary {
 </ul></li>
 </ul>
 </div>
-<div id="shiny-functionality" class="section level3">
-<h3>Shiny Functionality</h3>
-<p>I’ve spent most of this week playing around with some of the basic functionality of Shiny.</p>
+<div id="shiny-functionality" class="section level2">
+<h2>Shiny Functionality</h2>
+<p>I’ve spent most of this week playing around with some of the basic functionality of Shiny apps.</p>
 <p>In <em>Mastering Shiny</em>, Wickham lays out the “Getting Started” section into three categories:</p>
 <ul>
 <li>The basics: to help get us going with Shiny
@@ -410,7 +410,6 @@ summary {
 <li>Reactivity: to help to lay the foundation for <em>how</em> shiny works, at least from a purely functional perspective</li>
 </ul>
 <p>I did this chapter after building the <a href="https://shiny.rstudio.com/articles/build.html">mpg app</a>, where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually. My version of this app (though it’s 99% the same) is <a href="https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/First">here</a>.</p>
-</div>
 <div id="exercises" class="section level3">
 <h3>Exercises</h3>
 <p>For <a href="https://mastering-shiny.org/basic-app.html#exercises">Chapter 2</a> I did a total of five exercises.</p>
@@ -678,14 +677,14 @@ library(vroom)</code></pre>
 ##   print.date_names vroom
 ##   print.locale     vroom
 ##   str.col_spec     vroom</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ tibble  2.1.3     ✓ dplyr   1.0.0
 ## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
 ## ✓ readr   1.3.1     ✓ forcats 0.4.0
 ## ✓ purrr   0.3.4</code></pre>
 <pre><code>## Warning: package 'purrr' was built under R version 3.6.2</code></pre>
 <pre><code>## Warning: package 'dplyr' was built under R version 3.6.2</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## x readr::col_character()  masks vroom::col_character()
 ## x readr::col_date()       masks vroom::col_date()
 ## x readr::col_datetime()   masks vroom::col_datetime()
@@ -813,8 +812,9 @@ shinyApp(ui = ui, server = server)</code></pre>
 <div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
 <p>Needless to say, wow, there is a lot to make these things interesting and intelligent. I’m glad to play with Wickham’s more established Shiny app, but also reminded that it’s going to be a long road.</p>
 </div>
-<div id="week-reflection-coffee-project" class="section level3">
-<h3>Week Reflection, Coffee Project</h3>
+</div>
+<div id="week-reflection-coffee-project" class="section level2">
+<h2>Week Reflection, Coffee Project</h2>
 <p>Things are going well overall. I’ve been using Eight Ounce Coffee’s (website)[<a href="https://eightouncecoffee.ca/" class="uri">https://eightouncecoffee.ca/</a>] to start some scraping. My first week’s scraper worked well, but wasn’t rerunable in the second week. It seems there will be inconsitencies in the precise way they upload bags to the website – mostly based on the number leading /n characters in the <code>html_node</code> character string. These /n characters are used as splitting mechanisms to grab the coffee name, rewrite it as a hypenated string, and then pushed into a for loop with <code>read_html</code>. These individual hyperlinks to pull in the coffee details. When the data comes in, it’s a bit messy, and it looks like some weeks will have more details available than others. I will have to build something flexible enough to properly write each metric to the appropriate column. Unlike last week, I wrote this week’s coffee to a csv when it’s all said and done so I don’t have to rerun the HTML files again. Stuff gets taken down very quickly, as you’d expect. Once a week seems good though (having actually popped into The Library Specialty Coffee this week, their shelf mirrors Eight Ounce’s website.) It shouldn’t take long to grab a lot more roasters and use the same methodology. The resuling csv should be about 5 coffees per roaster, per week (maybe slower for some of the smaller roasters), so we’ll have close to 100 coffees a week scraped off Eight Ounce. That’s really nice.</p>
 </div>
 
