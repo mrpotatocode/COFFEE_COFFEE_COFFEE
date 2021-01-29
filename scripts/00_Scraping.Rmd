@@ -1,5 +1,5 @@
 ---
-title: "Scraping"
+title: "00_Scraping"
 author: "Thomas Rosenthal"
 date: "14/01/2021"
 output: html_document
@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir  = '..')
 ```
 
 read in the libraries
@@ -15,12 +16,8 @@ library(tidyverse)
 library(rvest)
 library(lubridate)
 library(stringr)
+library(data.table)
 ```
-
-```{r "setup", include=FALSE}
-knitr::opts_knit$set(root.dir  = '..')
-```
-
 
 ```{r}
 rundate = toString(sapply(date(now()), gsub, pattern = "-", replacement = "", fixed = TRUE))
@@ -31,8 +28,6 @@ get and save data
 #run line first
 #then save (block 2)
 #then comment out
-
-
 
 raw_data <- read_html("https://eightouncecoffee.ca/collections/the-library-specialty-coffee")
 write_html(raw_data,paste0("inputs/data/EightOunce/TLS_" ,rundate, ".html"))
@@ -57,6 +52,14 @@ raw_data %>%
   html_nodes("a") %>% 
   #html_nodes("li") %>% 
   html_text()
+slightly_cleaned_data
+
+  # html_nodes("body") %>%
+  #   html_nodes("div [class='transition-body']") %>% 
+  #   html_nodes("main") %>%
+  #   html_nodes("div [class='grid-product__content']") %>% 
+  #   html_nodes("div [class='grid-product__title grid-product__title--heading']")
+  # html_text()
 ```
 
 deal with the character vector
@@ -68,7 +71,6 @@ tibble(raw_text = slightly_cleaned_data)
 
 parse, focus on the blank line string:
 ```{r}
-library(data.table)
 our_data <- our_data %>% 
   mutate(is_TLS = if_else(raw_text %like% "\n\n\n\n\n\n\n ",1,0)) %>% 
   filter(is_TLS == 1) 
