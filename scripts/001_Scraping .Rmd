@@ -51,7 +51,8 @@ raw_data %>%
   #html_nodes("div [class='transition-body']") %>% 
   #html_nodes("main") %>%
   #html_nodes("div [class='grid-product__content']") %>% 
-  html_nodes("div [class='grid-product__title grid-product__title--heading']") %>% 
+  #html_nodes("div [class='grid-product__title grid-product__title--heading']") %>% 
+  html_nodes("div [class='grid-product__content']") %>% 
   html_text()
 slightly_cleaned_data
 ```
@@ -162,7 +163,8 @@ for(i in URLs){
   
   for (i in nrow(coffee)) {
       coffee_table <- rbind(coffee_table, data.frame(coffee))
-      }
+  }
+  Sys.sleep(2.5)
 }
 ```
 
