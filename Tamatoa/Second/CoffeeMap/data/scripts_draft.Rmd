@@ -1,0 +1,196 @@
+---
+title: "notebook"
+author: "Thomas Rosenthal"
+date: "11/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(here)
+library(ggplot2)
+library(ggradar)
+library(ggthemes)
+```
+
+
+```{r}
+datafolder = "/Tamatoa/Second/CoffeeMap/data/" 
+
+overall_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "Overall")
+overall_empty = c(0,"","","","","","","","","",0,"","","2017-01-01","","",0)
+overall_data <- rbind(overall_empty,overall_data)
+
+
+t_notes_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "T_Notes")
+
+t_notes_empty = c(0,0,"Sweet",0,0)
+t_notes_data <- rbind(t_notes_empty,t_notes_data)
+```
+
+```{r}
+data <- inner_join(overall_data,t_notes_data, by="ID")
+head(data)
+```
+
+
+```{r}
+iso <- read_xls(paste0(here(),datafolder, 'iso_3digit_alpha_country_codes.xls'))
+```
+
+```{r}
+t_notes_radar <- 
+  t_notes_data %>% 
+  select(-"X-Axis",-"Y-Axis",-"Ord") %>%  
+  pivot_wider(names_from=TastingNote, values_from = Result) %>% 
+  inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>% 
+  unite(Roaster, Country, Name) %>% 
+  rename(group = Roaster) %>% 
+  select(-"NA") %>% 
+  #mutate_each(funs(scales::rescale), -group) %>% 
+  relocate(group, .before = Sweet)
+```
+```{r}
+altitude <- 
+  overall_data %>% 
+  select(ID, Roaster, Country, Name, Elevation) %>% 
+  unite(Roaster, Country, Name) %>% 
+  rename(group = Roaster) %>% 
+  relocate(group, .after = ID) %>% 
+  filter(!is.na(Elevation)) %>% 
+  rename(value = Elevation) %>% 
+  mutate(value = str_replace_all(value, "\\+", "") ,.keep=c("unused")) %>% 
+  mutate(value = str_replace_all(value, "m", "") ,.keep=c("unused")) 
+
+altitude$value = sapply(strsplit(altitude$value, split = "-", fixed = TRUE), function(k) mean(as.numeric(k)))
+
+alt_min <- min(altitude[,"value"])
+alt_max <- max(altitude[,"value"])
+adj <- (alt_max - alt_min) /10
+
+#altitude$ID <- 1:length(altitude$ID)
+```
+
+```{r}
+id = 1
+```
+
+```{r}
+t_notes_head = t_notes_radar[which(t_notes_radar$ID == id),] %>% select(-group) %>% mutate_if(is.character,as.numeric) 
+
+ggradar(t_notes_head, font.radar = "Times", axis.label.size = 4, plot.legend = TRUE, values.radar= c(1,3,5),
+        grid.min=1, grid.mid = 3, grid.max = 5, grid.label.size = 4, group.point.size = 3, group.colours = "#000000")
+```
+
+```{r}
+id = 3
+pos = as.integer(altitude[which(altitude$ID == id),]['value'])
+
+height = (pos- (alt_min-adj)) /((alt_max+adj) - (alt_min-adj))
+a = (height*sin(0.5236)/sin(1.0472))*.875
+
+positions <- data.frame(
+  ID = rep(c(0,id), each = 4),
+  x = c(0, 1, .5, 0, 0, 1,(1-a),(a)), #1.275, .725),
+  y = c(alt_min-adj,alt_min-adj,alt_max+adj,alt_min-adj,
+        alt_min-adj,alt_min-adj,pos,pos) #,1850,1850)
+)
+
+# Currently we need to manually merge the two together
+data_poly <- merge(altitude, positions, by = c("ID"))
+
+#datapoly <- data_poly
+datapoly <- head(data_poly,8)
+
+data_poly %>% mutate(value = as.integer(value))
+
+
+#datapoly$value=as.integer(datapoly$value)
+
+p <- ggplot(datapoly, aes(x = x, y = y)) +
+  geom_polygon(aes(fill = value, group = ID)) +
+  scale_fill_gradient(high = "#003d00", low = "#006000", na.value = NA) +
+  ggtitle(paste0(paste0("Elevation: ",  datapoly$value)[5], " MASL")) +
+  theme_void()
+p
+```
+
+```{r}
+
+iso_lookup <- 
+  overall_data %>% 
+  select(ID, Country) %>%
+  rename(Definition = Country) %>% 
+  merge(iso,.)
+
+code = iso_lookup[which(iso_lookup$ID == id),]['Code Value']
+country = iso_lookup[which(iso_lookup$ID == id),]['Definition']
+
+varDF <- data.frame(country = code, Country.of.Origin = country$Definition)
+# malDF is a data.frame with the ISO3 country names plus a variable to
+# merge to the map data
+
+Map <- joinCountryData2Map(varDF, joinCode = "ISO3",
+  nameJoinColumn = "Code.Value")
+# This will join your malDF data.frame to the country map data
+
+mapCountryData(Map, nameColumnToPlot="Country.of.Origin", catMethod = "categorical",
+  missingCountryCol = gray(.8))
+# And this will plot it, with the trick that the color palette's first
+# color is red
+```
+
+
+```{r}
+# triangle_lines <- data.frame(
+#   X   = c(0,0,1,1,0.5,0.5),
+#   Y   = c(0,0,0,0,1,  1),
+#   grp = c(1,2,1,3,2,3)
+# )
+# 
+# gradient_list <- list()
+# for (lambda_x in seq(0,1,by=0.01)) {
+#   for (lambda_y in seq(0,1,by=0.01)) {
+#     x_value <- lambda_x*0 + (1-lambda_x)*1
+#     y_value <- lambda_y*0 + (1-lambda_y)*1
+#     
+#     inside_polygon <- sp::point.in.polygon(x_value, y_value, triangle_lines$X, triangle_lines$Y) %>% as.logical()
+#     
+#     if (inside_polygon) {
+#       point <- c(x_value, y_value)
+#       distances <- sqrt(2) - sqrt((scatters$x - point[1])^2 + (scatters$y - point[2])^2)
+#       weighted_distances <- distances/sum(distances)
+#       amount <- sum(weighted_distances * df$z)
+#       gradient_list <- append(gradient_list, list(c(point, amount)))
+#     }
+#   }
+# }
+# 
+# gradient_df <- do.call(rbind, gradient_list) %>% as.data.frame()
+# colnames(gradient_df) <- c("x","y","amount")
+# 
+# 
+# ggplot(gradient_df, aes(x=x, y=y)) + 
+#   geom_point(aes(colour = amount), size=2) +
+#   theme_void() + 
+#   geom_line(data=triangle_lines, aes(X, Y, group = grp), size=3, colour="white", lineend="round")
+```
+
+
+```{r}
+t_notes_data %>% 
+        select(-"X-Axis",-"Y-Axis",-"Ord") %>%  
+        pivot_wider(names_from=TastingNote, values_from = Result) %>% 
+        inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>% 
+        unite(Roaster, Country, Name) %>% 
+        rename(group = Roaster) %>% 
+        select(-"NA") %>% 
+        #mutate_each(funs(scales::rescale), -group) %>% 
+        relocate(group, .before = Sweet) %>% filter(ID == 1)
+```
+
