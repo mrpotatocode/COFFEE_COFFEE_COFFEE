@@ -28,9 +28,9 @@ overall_data <- rbind(overall_empty,overall_data)
 
 
 t_notes_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "T_Notes")
-
-t_notes_empty = c(0,0,"Sweet",0,0)
-t_notes_data <- rbind(t_notes_empty,t_notes_data)
+t_notes_data <- t_notes_data %>% mutate( ID = as.character(ID))
+#t_notes_empty = c(0,0,"Sweet",0,0)
+#t_notes_data <- rbind(t_notes_empty,t_notes_data)
 ```
 
 ```{r}
@@ -77,7 +77,7 @@ adj <- (alt_max - alt_min) /10
 ```
 
 ```{r}
-id = 1
+id = 0
 ```
 
 ```{r}
@@ -88,7 +88,7 @@ ggradar(t_notes_head, font.radar = "Times", axis.label.size = 4, plot.legend = T
 ```
 
 ```{r}
-id = 3
+id = 1
 pos = as.integer(altitude[which(altitude$ID == id),]['value'])
 
 height = (pos- (alt_min-adj)) /((alt_max+adj) - (alt_min-adj))
@@ -115,7 +115,7 @@ data_poly %>% mutate(value = as.integer(value))
 p <- ggplot(datapoly, aes(x = x, y = y)) +
   geom_polygon(aes(fill = value, group = ID)) +
   scale_fill_gradient(high = "#003d00", low = "#006000", na.value = NA) +
-  ggtitle(paste0(paste0("Elevation: ",  datapoly$value)[5], " MASL")) +
+  ggtitle(paste0(paste0("Elevation: ",  if(is.na(datapoly$value[5]) == TRUE){"Unknown"}else{datapoly$value[5]}), " MASL")) +
   theme_void()
 p
 ```
@@ -183,14 +183,18 @@ mapCountryData(Map, nameColumnToPlot="Country.of.Origin", catMethod = "categoric
 
 
 ```{r}
-t_notes_data %>% 
-        select(-"X-Axis",-"Y-Axis",-"Ord") %>%  
-        pivot_wider(names_from=TastingNote, values_from = Result) %>% 
-        inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>% 
-        unite(Roaster, Country, Name) %>% 
-        rename(group = Roaster) %>% 
-        select(-"NA") %>% 
-        #mutate_each(funs(scales::rescale), -group) %>% 
-        relocate(group, .before = Sweet) %>% filter(ID == 1)
+# t_notes_data %>% 
+#         select(-"X-Axis",-"Y-Axis",-"Ord") %>%  
+#         pivot_wider(names_from=TastingNote, values_from = Result) %>% 
+#         inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>% 
+#         unite(Roaster, Country, Name) %>% 
+#         rename(group = Roaster) %>% 
+#         select(-"NA") %>% 
+#         #mutate_each(funs(scales::rescale), -group) %>% 
+#         relocate(group, .before = Sweet) %>% filter(ID == 1)
 ```
 
+
+```{r}
+mapCountryData(Map, nameColumnToPlot="SU_A3", missingCountryCol = gray(.8),catMethod = "categorical",addLegend=FALSE, mapTitle= 'Pick a Coffee to Map',colourPalette= 'black2White')
+```

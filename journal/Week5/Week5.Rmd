@@ -1,0 +1,217 @@
+---
+title: "Week5"
+author: "Thomas Rosenthal"
+date: "13/02/2021"
+output: html_document
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir  = '../..')
+```
+
+## Weekly Reflection: Baby Potato's First Shiny App
+
+> is it just me or does shiny literally look like an incomprehensible language for the first 40 minutes of staring at it
+
+Coming back to Shiny a few weeks after my first readthrough of chapters 1-5 of Wickham's _Mastering Shiny_ probably made this a fair bit harder than it needed to be. Aside from getting a working app [(yay)](https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/Second/CoffeeMap), I had a few realizations that I want to record here.
+
+### Thought #1: Parameter Selection
+
+First, think about what your input parameters will be. In this case, I knew it would be a bit of a pain to pass around a string (especially one that I might decide to manipulate later, or might not be unique), so I added in an ID field to act as my joining key, and more importantly, my input parameter by which the entirety of the outputs would be filtered.
+
+Outside of Shiny, I built an R Markdown version of this by declaring an ```ID = <...>``` at the start of the project before working this into each dataframe. This allowed me to easily translate from the ID filtering to reactive() filtering. Let's look at an example.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(here)
+
+datafolder = "/Tamatoa/Second/CoffeeMap/data/" 
+overall_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "Overall")
+
+t_notes_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "T_Notes")
+```
+
+After loading in my dataframe ```t_notes_data```, I've declared ```id = 1```, performed the data work of choice, and then added tidy's ```filter()``` to the end of the block.
+
+```{r, message=FALSE}
+id = 1
+
+t_notes_radar <- t_notes_data %>%
+  select(-"X-Axis",-"Y-Axis",-"Ord") %>%
+  pivot_wider(names_from=TastingNote, values_from = Result) %>%
+  inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>%
+  unite(Roaster, Country, Name) %>%
+  rename(group = Roaster) %>%
+  select(-"NA") %>%
+  relocate(group, .before = Sweet) %>% 
+  filter(ID == id)
+
+knitr::kable(t_notes_radar)
+```
+
+Within the Shiny app's server section, this looks almost identical, but I have an added reactive() call wrapping the request, and rather than ```ID == id```, I have written ```ID == input$code```.
+
+```
+t_notes_radar <- reactive({ 
+  t_notes_data %>% 
+  select(-"X-Axis",-"Y-Axis",-"Ord") %>%  
+  pivot_wider(names_from=TastingNote, values_from = Result) %>% 
+  inner_join((overall_data %>% select(ID, Roaster, Country, Name)),.) %>% 
+  unite(Roaster, Country, Name) %>% 
+  rename(group = Roaster) %>% 
+  select(-"NA") %>% 
+  relocate(group, .before = Sweet) %>% 
+  filter(ID == input$code)
+  })
+```
+
+Obviously I'm not done here. Within the UI section I need to establish what input$code will be. This leads me to Thought #2.
+
+### Thought #2: Write the App Backwards?
+
+Shiny feels like it's almost laid out backwards. First you establish some basic preprocessing lines (load your data, make some easy transformations and aggregations), but then you're asked to lay out your UI section. You start off...
+
+```
+ui <- fluidPage(
+
+    titlePanel("The best shiny app ever"),
+    
+    fluidRow(column(6,
+           selectInput(...choices = setNames( .... ))
+           )
+        )
+      )
+```
+
+...and pretty quickly realize that aside from a bit of basic framing (and parameter selection!), you really can't write much else.
+
+Here it dawned on me that UI is the final thing you write, not the first thing. Since I'd already written my code in an R Markdown file, I assumed it would be fairly simple to bring the bulk of it in as preprocessing, but realized that the reactive filtering established earlier on meant A LOT of smaller code chunks were also going to be reactive (in other words, it's pretty easy to create a lot of dependencies).
+
+In the simple practice exercises, I don't think this was as obvious, and brings me to Thought #3.
+
+### Thought #3: Print Statements...sorta
+
+My app code ended up being a tiny bit different than what I originally wrote in R Markdown, and honestly I couldn't tell you why. At one point, I needed to build a dataframe from a collection of integers (this has been simplified slightly):
+
+```{r}
+## these two variables were simplified
+a = .2
+pos = 1850 
+
+positions <- data.frame(
+  ID = rep(c(0,id), each = 4),
+  x = c(0, 1, .5, 0, 0, 1, (1-a), a),
+  y = c(0, 0, 2200, 0, 0, 0 ,pos,pos)
+)
+knitr::kable(positions)
+```
+
+Shiny wouldn't work with this. The code should have been the same:
+
+```
+pos <-  reactive(df %>% filter(ID == input$code) %>% select("value"))
+a <-  reactive((height()*sin(0.5236)/sin(1.0472))*.875)
+
+positions <- reactive(data.frame(
+  ID = rep(c(0,id), each = 4),
+  x = c(0, 1, .5, 0, 0, 1, (1-a()), a()),
+  y = c(0, 0, 2200, 0, 0, 0 ,pos(), pos())
+))
+```
+...but ended up needing a fairly different set of commands (again, this is slightly simplified):
+
+```
+pos <-  reactive(df %>% filter(ID == input$code) %>% select("value"))
+a <-  reactive((height()*sin(0.5236)/sin(1.0472))*.875)
+    
+IDx <- reactive(rep(c(0,input$code), each = 4))
+xx <- reactive(c(0, 1, .5, 0, 0, 1, (1-a()), a()))
+yy <- reactive(rep(c(0, 0, 2200, 0, 0, 0, pos(), pos()), each = 1))
+    
+positions <- reactive(tibble(
+   ID = IDx(),
+   x = xx(),
+   y = yy()
+))   
+```
+
+To figure this out, I really needed to see what was happening at each intermediate stage. In come "print" statements. No, not those ```print()``` statements...
+
+First, add a line to output a table in the server section below the code you need to get to work:
+
+```
+output$pleasehelpme <- renderTable(<...>)
+```
+
+Then, add a tableOutput somewhere in the UI section:
+
+```
+fluidRow(
+    column(6,tableOutput("pleasehelpme"))
+         )
+```
+
+Now move through each intermediate stage.
+
+```
+output$pleasehelpme <- renderTable(pos)
+```
+
+Run the app. Does it look right? Yes? Good job, we move on.
+
+```
+#output$pleasehelpme <- renderTable(pos())
+output$pleasehelpme <- renderTable(a())
+```
+
+Run the app again. Does it look right? No? Fix it. Somehow fix it. Please fix it. 
+
+Again and again.
+
+```
+#output$pleasehelpme <- renderTable(pos())
+#output$pleasehelpme <- renderTable(a())
+#output$pleasehelpme <- renderTable(IDx())
+#output$pleasehelpme <- renderTable(xx())
+#output$pleasehelpme <- renderTable(yy())
+output$pleasehelpme <- renderTable(positions())
+```
+
+Until each step works as expected. If the same output$name is repeated, there's no need to make changes to the UI section. This feels to me a bit like running a print statement in the middle of a function or for loop to see if it's working. (Obviously you don't need to keep them all, you can just replace the argument in ```renderTable()```, but it's pretty useful while you're working it out.) 
+
+This seems somewhat, uhh, dumb, but honestly, it's way better than scratching your head for an hour over something it turns out you needed to make a small adjustment to. Eventually everything starts working for whichever section you're writing. Onto the next until this is over.
+
+### Thought #4: Publish It
+
+Publishing is so easy...
+
+> 19 minutes is faster than average 
+
+...okay, like not that easy.
+
+- Go to [shinyapps.io](https://www.shinyapps.io). 
+- Make an account. Please do not give Facebook or Google your data for the love of god.
+- Click the publish button on the Shiny app window.
+- Grab your key (go to the account section of shinyapps.io and copy and paste).
+- Whoops it failed? Almost certainly it's because the reference to your data source is different...:
+
+```
+#switch these to work local vs on shinyapps.io
+#the local folder (probably not the same)
+#datafolder = "/Tamatoa/Second/CoffeeMap/data/" 
+
+#the online folder path (probably the same)
+datafolder = "/data/"
+
+cool_data <- read_xlsx(paste0(here(),datafolder, 'sweetexcelname.xlsx'))
+````
+
+- Failed again? Double-check you have loaded all your libraries. 
+- Failed AGAIN? I THOUGHT THIS WAS EASY...okay, why don't we nuke the environment and make sure our Shiny is working locally (seriously, why don't I do this for every script?).
+- Insert a bullet for another bug of some sort. Fix this. Good job.
+- Wait for it to deploy a million times.
+- PROFIT.
+
+Congrats, I hope you are [SHINY](https://www.youtube.com/watch?v=93lrosBEW-Q).

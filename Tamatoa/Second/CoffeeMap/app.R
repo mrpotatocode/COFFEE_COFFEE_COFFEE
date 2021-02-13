@@ -19,8 +19,8 @@ library(rworldmap)
 #load data
 
 #switch these to work local vs on shinyapps.io
-#datafolder = "/Tamatoa/Second/CoffeeMap/data/" 
-datafolder = "/data/"
+datafolder = "/Tamatoa/Second/CoffeeMap/data/" 
+#datafolder = "/data/"
 
 #overall data load
 overall_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "Overall")
@@ -30,9 +30,10 @@ overall_data <- rbind(overall_empty,overall_data)
 
 #tasting notes data load
 t_notes_data <- read_xlsx(paste0(here(),datafolder, '33cups.xlsx'), sheet = "T_Notes")
+t_notes_data <- t_notes_data %>% mutate( ID = as.character(ID))
 #need an empty row
-t_notes_empty = c(0,0,"Sweet",0,0)
-t_notes_data <- rbind(t_notes_empty,t_notes_data)
+#t_notes_empty = c(0,0,"Sweet",0,0)
+#t_notes_data <- rbind(t_notes_empty,t_notes_data)
 
 #ISO data
 iso <- read_xls(paste0(here(),datafolder, 'iso_3digit_alpha_country_codes.xls'))
@@ -63,7 +64,7 @@ ui <- fluidPage(
     titlePanel("My Favourite Coffees"),
 
     fluidRow(column(6,
-           selectInput("code", "Coffee",
+           selectInput("code", "Coffee","Country",
                        choices = setNames(overall_data$ID, 
                                           overall_data$Coffee),
                        width = "100%")
@@ -76,7 +77,7 @@ ui <- fluidPage(
             ),
     
     fluidRow(
-        column(8, plotOutput("map"))
+        column(8, plotOutput("map")),
             ),
     
     fluidRow(
@@ -130,8 +131,14 @@ server <- function(input, output) {
 
     output$table <- renderTable(selected())
     
-    output$map <- renderPlot({mapCountryData(Map(), nameColumnToPlot="Country.of.Origin", catMethod = "categorical",
-                    missingCountryCol = gray(.8), aspect = 1)},res = 72)
+    output$map <- renderPlot(
+            {if(input$code == 0){
+        mapCountryData(Map(), nameColumnToPlot="SU_A3", catMethod = "categorical",
+                     missingCountryCol = gray(.8),addLegend=FALSE, mapTitle= 'Pick a Coffee to Map',colourPalette= 'black2White')
+            } else {
+        mapCountryData(Map(), nameColumnToPlot="Country.of.Origin", catMethod = "categorical",
+                    missingCountryCol = gray(.8), mapTitle= 'Country of Origin')}}#,res = 72
+            )
 
     alt_min <- reactive(min(altitude[,"value"]))
     alt_max <- reactive(max(altitude[,"value"]))
@@ -162,7 +169,8 @@ server <- function(input, output) {
     output$triange <- renderPlot({ggplot(datapoly(), aes(x = x, y = y)) +
         geom_polygon(aes(fill = value, group = ID)) +
         scale_fill_gradient(high = "#003d00", low = "#006000", na.value = NA, guide=FALSE) +
-        ggtitle(paste0(paste0("Elevation: ",  datapoly()$value)[5], " MASL")) +
+        ggtitle(paste0(paste0("Elevation: ", 
+                            if(is.na(datapoly()$value[5]) == TRUE){"Unknown"}else{datapoly()$value[5]}), " MASL")) +
         theme_void()
         })
 

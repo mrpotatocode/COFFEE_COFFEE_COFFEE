@@ -1,0 +1,28 @@
+---
+title: "Week1"
+author: "Thomas Rosenthal"
+date: "14/01/2021"
+output: html_document
+---
+
+## Literature, Planning the Project
+
+
+## Week Reflection
+
+Things are started!
+I've built a scraper for data on Eight Ounce Coffee's (website)[https://eightouncecoffee.ca/]. I've focused on Coffee's from The Library Speciality Coffee (TLS) here in Toronto.
+
+The basic concept is:
+
+- Grab the names of this week's TLS coffees
+- Get the details of each of those coffees
+  - Fortunate to see that names are easily translated into a hyperlink(.../Ethopia-Sidma-Washed/)
+- Build a table with the types of relevent 
+
+
+|       | Roaster                      | Country | Region | Variety  | Process | Tasting Notes             |
+|-------|------------------------------|---------|--------|----------|---------|---------------------------|
+| 1     | The Library Specialty Coffee | Ethopia | Sidma  | Heirloom | Washed  | Peach, Blackberry, Floral |
+
+More later.
