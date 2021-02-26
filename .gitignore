@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 #Sey folder excluded
 /inputs/data/Sey
+
+#DS Store
+.DS_Store
