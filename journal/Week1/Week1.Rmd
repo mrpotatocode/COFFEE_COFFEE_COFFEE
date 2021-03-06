@@ -2,13 +2,12 @@
 title: "Week1"
 author: "Thomas Rosenthal"
 date: "14/01/2021"
-output: html_document
+output:
+  github_document:
+    html_preview: false
 ---
 
-## Literature, Planning the Project
-
-
-## Week Reflection
+## Weekly Reflection: Getting Started
 
 Things are started!
 I've built a scraper for data on Eight Ounce Coffee's (website)[https://eightouncecoffee.ca/]. I've focused on Coffee's from The Library Speciality Coffee (TLS) here in Toronto.
