@@ -2,7 +2,9 @@
 title: "Week5"
 author: "Thomas Rosenthal"
 date: "13/02/2021"
-output: html_document
+output:
+  github_document:
+    html_preview: false
 ---
 
 ```{r setup, echo=FALSE}
