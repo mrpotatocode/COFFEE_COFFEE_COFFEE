@@ -1,6 +1,7 @@
 Week2
 ================
 Thomas Rosenthal
+
 21/01/2021
 
 ## Weekly Reflection
