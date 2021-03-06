@@ -1,6 +1,7 @@
 Week1
 ================
 Thomas Rosenthal
+
 14/01/2021
 
 ## Weekly Reflection: Getting Started
