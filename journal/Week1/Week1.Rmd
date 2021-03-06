@@ -1,7 +1,6 @@
 ---
 title: "Week1"
 author: "Thomas Rosenthal"
-
 date: "14/01/2021"
 output:
   github_document:

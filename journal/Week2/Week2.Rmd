@@ -3,7 +3,8 @@ title: "Week2"
 author: "Thomas Rosenthal"
 date: "21/01/2021"
 output:
-  html_document: default
+  github_document:
+    html_preview: false
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir  = '../..')
 ```
 
-## Literature
+## Weekly Reflection
+
+### Literature
 Reading through [Shapiro](https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml), a few thoughts arise. 
 
 - What automation options exist for this project?
@@ -27,7 +30,7 @@ Reading through [Shapiro](https://web.stanford.edu/~gentzkow/research/CodeAndDat
     - Great story with the light switch. Just keep people from running code that will break, rather than marking "don't do this". 
     
 
-## Shiny Functionality
+### Shiny Functionality
 I've spent most of this week playing around with some of the basic functionality of Shiny apps. 
 
 In _Mastering Shiny_, Wickham lays out the "Getting Started" section into three categories:
@@ -41,7 +44,7 @@ In _Mastering Shiny_, Wickham lays out the "Getting Started" section into three 
 
 I did this chapter after building the [mpg app](https://shiny.rstudio.com/articles/build.html), where I essentially wrote out the code (rather than copying and pasting, which helped immensely) and changed some colours around. I was glad I did it in this order actually. My version of this app (though it's 99% the same) is [here](https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/Tamatoa/First). 
 
-### Exercises
+#### Exercises
 
 For [Chapter 2](https://mastering-shiny.org/basic-app.html#exercises) I did a total of five exercises.
 
@@ -406,7 +409,7 @@ shinyApp(ui = ui, server = server)
 
 Needless to say, wow, there is a lot to make these things interesting and intelligent. I'm glad to play with Wickham's more established Shiny app, but also reminded that it's going to be a long road.
 
-## Week Reflection, Coffee Project
+### Coffee Project
 
 Things are going well overall. 
 I've been using Eight Ounce Coffee's (website)[https://eightouncecoffee.ca/] to start some scraping. My first week's scraper worked well, but wasn't rerunable in the second week. It seems there will be inconsitencies in the precise way they upload bags to the website -- mostly based on the number leading /n characters in the ```html_node``` character string. These /n characters are used as splitting mechanisms to grab the coffee name, rewrite it as a hypenated string, and then pushed into a for loop with ```read_html```. These individual hyperlinks to pull in the coffee details. When the data comes in, it's a bit messy, and it looks like some weeks will have more details available than others. I will have to build something flexible enough to properly write each metric to the appropriate column. Unlike last week, I wrote this week's coffee to a csv when it's all said and done so I don't have to rerun the HTML files again. Stuff gets taken down very quickly, as you'd expect. Once a week seems good though (having actually popped into The Library Specialty Coffee this week, their shelf mirrors Eight Ounce's website.) It shouldn't take long to grab a lot more roasters and use the same methodology. The resuling csv should be about 5 coffees per roaster, per week (maybe slower for some of the smaller roasters), so we'll have close to 100 coffees a week scraped off Eight Ounce. That's really nice.
