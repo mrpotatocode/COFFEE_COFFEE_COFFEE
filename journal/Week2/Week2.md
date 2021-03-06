@@ -104,8 +104,6 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
-    ## PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-
 <!--html_preserve-->
 
 <div class="muted well" style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;">
@@ -238,11 +236,7 @@ which are annotated
 
 ``` r
 library(ggplot2)
-```
 
-    ## Warning: package 'ggplot2' was built under R version 3.6.2
-
-``` r
 datasets <- data(package = "ggplot2")$results[c(2, 4, 10), "Item"]
 
 ui <- fluidPage(
@@ -450,96 +444,13 @@ proceeded to the case study in
 ``` r
 library(shiny)
 library(vroom)
-```
-
-    ## Warning: package 'vroom' was built under R version 3.6.2
-
-``` r
 library(tidyverse)
-```
 
-    ## Registered S3 methods overwritten by 'readr':
-    ##   method           from 
-    ##   format.col_spec  vroom
-    ##   print.col_spec   vroom
-    ##   print.collector  vroom
-    ##   print.date_names vroom
-    ##   print.locale     vroom
-    ##   str.col_spec     vroom
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
-
-    ## ✓ tibble  3.1.0     ✓ dplyr   1.0.4
-    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ## ✓ readr   1.3.1     ✓ forcats 0.4.0
-    ## ✓ purrr   0.3.4
-
-    ## Warning: package 'purrr' was built under R version 3.6.2
-
-    ## Warning: package 'dplyr' was built under R version 3.6.2
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x readr::col_character()  masks vroom::col_character()
-    ## x readr::col_date()       masks vroom::col_date()
-    ## x readr::col_datetime()   masks vroom::col_datetime()
-    ## x readr::col_double()     masks vroom::col_double()
-    ## x readr::col_factor()     masks vroom::col_factor()
-    ## x readr::col_guess()      masks vroom::col_guess()
-    ## x readr::col_integer()    masks vroom::col_integer()
-    ## x readr::col_logical()    masks vroom::col_logical()
-    ## x readr::col_number()     masks vroom::col_number()
-    ## x readr::col_skip()       masks vroom::col_skip()
-    ## x readr::col_time()       masks vroom::col_time()
-    ## x readr::cols()           masks vroom::cols()
-    ## x readr::default_locale() masks vroom::default_locale()
-    ## x dplyr::filter()         masks stats::filter()
-    ## x readr::fwf_empty()      masks vroom::fwf_empty()
-    ## x readr::fwf_positions()  masks vroom::fwf_positions()
-    ## x dplyr::lag()            masks stats::lag()
-    ## x readr::locale()         masks vroom::locale()
-
-``` r
 #preprocesss
 injuries <- vroom::vroom("Tamatoa/Exercises/Chapter5/neiss/injuries.tsv.gz")
-```
-
-    ## Rows: 255,064
-    ## Columns: 10
-    ## Delimiter: "\t"
-    ## chr  [6]: sex, race, body_part, diag, location, narrative
-    ## dbl  [3]: age, prod_code, weight
-    ## date [1]: trmt_date
-    ## 
-    ## Use `spec()` to retrieve the guessed column specification
-    ## Pass a specification to the `col_types` argument to quiet this message
-
-``` r
 products <- vroom::vroom("Tamatoa/Exercises/Chapter5/neiss/products.tsv")
-```
-
-    ## Rows: 38
-    ## Columns: 2
-    ## Delimiter: "\t"
-    ## chr [1]: title
-    ## dbl [1]: prod_code
-    ## 
-    ## Use `spec()` to retrieve the guessed column specification
-    ## Pass a specification to the `col_types` argument to quiet this message
-
-``` r
 population <- vroom::vroom("Tamatoa/Exercises/Chapter5/neiss/population.tsv")
-```
 
-    ## Rows: 170
-    ## Columns: 3
-    ## Delimiter: "\t"
-    ## chr [1]: sex
-    ## dbl [2]: age, population
-    ## 
-    ## Use `spec()` to retrieve the guessed column specification
-    ## Pass a specification to the `col_types` argument to quiet this message
-
-``` r
 count_top <- function(df, var, n) {
     df %>%
         mutate({{ var }} := fct_lump(fct_infreq({{ var }}), n = n)) %>%
@@ -636,23 +547,23 @@ app, but also reminded that it’s going to be a long road.
 ### Coffee Project
 
 Things are going well overall. I’ve been using Eight Ounce Coffee’s
-(website)\[<https://eightouncecoffee.ca/>\] to start some scraping. My
-first week’s scraper worked well, but wasn’t rerunable in the second
-week. It seems there will be inconsitencies in the precise way they
-upload bags to the website – mostly based on the number leading /n
-characters in the `html_node` character string. These /n characters are
-used as splitting mechanisms to grab the coffee name, rewrite it as a
-hypenated string, and then pushed into a for loop with `read_html`.
-These individual hyperlinks to pull in the coffee details. When the data
-comes in, it’s a bit messy, and it looks like some weeks will have more
-details available than others. I will have to build something flexible
-enough to properly write each metric to the appropriate column. Unlike
-last week, I wrote this week’s coffee to a csv when it’s all said and
-done so I don’t have to rerun the HTML files again. Stuff gets taken
-down very quickly, as you’d expect. Once a week seems good though
-(having actually popped into The Library Specialty Coffee this week,
-their shelf mirrors Eight Ounce’s website.) It shouldn’t take long to
-grab a lot more roasters and use the same methodology. The resuling csv
-should be about 5 coffees per roaster, per week (maybe slower for some
-of the smaller roasters), so we’ll have close to 100 coffees a week
-scraped off Eight Ounce. That’s really nice.
+[website](https://eightouncecoffee.ca/) to start some scraping. My first
+week’s scraper worked well, but wasn’t rerunable in the second week. It
+seems there will be inconsitencies in the precise way they upload bags
+to the website – mostly based on the number leading /n characters in the
+`html_node` character string. These /n characters are used as splitting
+mechanisms to grab the coffee name, rewrite it as a hypenated string,
+and then pushed into a for loop with `read_html`. These individual
+hyperlinks to pull in the coffee details. When the data comes in, it’s a
+bit messy, and it looks like some weeks will have more details available
+than others. I will have to build something flexible enough to properly
+write each metric to the appropriate column. Unlike last week, I wrote
+this week’s coffee to a csv when it’s all said and done so I don’t have
+to rerun the HTML files again. Stuff gets taken down very quickly, as
+you’d expect. Once a week seems good though (having actually popped into
+The Library Specialty Coffee this week, their shelf mirrors Eight
+Ounce’s website.) It shouldn’t take long to grab a lot more roasters
+and use the same methodology. The resuling csv should be about 5 coffees
+per roaster, per week (maybe slower for some of the smaller roasters),
+so we’ll have close to 100 coffees a week scraped off Eight Ounce.
+That’s really nice.
