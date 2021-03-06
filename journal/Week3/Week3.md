@@ -1,6 +1,7 @@
 Week3
 ================
 Thomas Rosenthal
+
 28/01/2021
 
 ## Weekly Reflection
@@ -21,9 +22,6 @@ that each coffee was grown. We see that this information isn’t listed on
 the collection
 page.
 
-
-![TLS](imgs/TLS.png)<!-- -->
-
 <img src="imgs/TLS.png" width="40%" />
 
 We’ll need to navigate to each coffee’s page, extract the **Altitude**,
@@ -34,7 +32,7 @@ process.
 Our example coffee, Bensa Segera from Ethiopia, was grown at *2100-2300
 m*:
 
-<img src="/imgs/bensa.png" width="45%" />
+<img src="imgs/bensa.png" width="45%" />
 
 Using
 [rvest](https://blog.rstudio.com/2014/11/24/rvest-easy-web-scraping-with-r/),
@@ -58,7 +56,7 @@ Once we have the html file, we’ll need to navigate to each coffee.
 
 The page source will start to show us what we are looking for. Here I’ve
 searched for “Bensa” just to move through the page a bit quicker.
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/page-source.png" width="75%" />
+<img src="imgs/page-source.png" width="75%" />
 
 When I first started working with rvest, I thought it was necessary to
 traverse an entire html “tree” going from one node to another.
@@ -157,7 +155,7 @@ tibble(raw_text = head(rough[c(53,64,75,86)],4))
 A better solution requires that we go back to the page
 source.
 
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/class=.png" width="100%" />
+<img src="imgs/class=.png" width="100%" />
 
 While I was trying to browse through these html files with 12,000 lines,
 I noticed that almost every `<div>` had either an **id =** or **class
@@ -293,7 +291,7 @@ That last point seemed like it wouldn’t happen. But I found out pretty
 quickly that I was
 wrong.
 
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/typo.png" width="35%" />
+<img src="imgs/typo.png" width="35%" />
 
 It might be hard to notice what’s happening here, but “Karogoto **AB**”
 should have been “Karogoto **AA**” (AA and AB are Kenyan grades, which
@@ -318,7 +316,7 @@ While digging around in the page source, I noticed that the URL was
 already
 listed:
 
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/href=.png" width="100%" />
+<img src="imgs/href=.png" width="100%" />
 
 So immediately I tried to grab that with class = grid-product\_\_link
 
