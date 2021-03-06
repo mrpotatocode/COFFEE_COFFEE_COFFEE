@@ -1,0 +1,359 @@
+---
+title: "Week7"
+author: "Thomas Rosenthal"
+date: "05/03/2021"
+output: html_document
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+```
+
+## Weekly Reflection: First Tidy Model
+
+<sub> spoiler: it sucks </sub>
+
+I had a bit too much optimism going into this week's modelling. At last, I'm getting to write a model based on all of this super interesting data! Following a rough two weeks of Bayesian modelling for another project, it was nice to come back to the land of coffee and start to see the [fruits](https://coffeechronicler.com/coffee-cherry-taste/) of my labour. 
+
+A binomial model shouldn't be too much to ask for, right? After all, it's literally the _[second](https://www.tidymodels.org/start/recipes/)_ article of Tidymodel's "Get Started" series. Let's dive right in.
+
+### Not enough data...not even remotely enough data
+
+I realized this a couple of weeks ago. The scrapers are working, but the sites aren't updating fast enough. I've started to supplement with some manually collected data in the meanwhile. This project was always envisioned to be at least a year long. Instead, it's being squeezed into 13 weeks, alongside two other courses. Silly me.
+
+Nonetheless, let's get it loaded.
+
+We'll start with a lovely bulk loading function from [this](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once) write-up.
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+```
+
+```{r, echo=TRUE}
+setwd('../..') #we'll need to go up a directory, because the Github Actions data is in another repo. 
+
+read_plus <- function(flnm) {
+    read_csv(flnm) %>% 
+        mutate(filename = flnm) %>% 
+        rename_with(str_to_title)}
+
+#we're using = instead of <- throughout this notebook because it going to sit in a Drake workflow
+raw_data = 
+  list.files(path = "../Automatic_Drip/R/outputs/",
+    pattern = "*.csv",
+    full.names = T) %>% 
+  map_df(~read_plus(.))
+```
+
+The ```read_plus``` function is a great addition to this process. At its most basic, it'd look like this:
+```{r, eval=FALSE, echo=TRUE}
+read_plus <- function(flnm) {
+    read_csv(flnm)}
+```
+...but we can add a fair amount of useful dplyr/plyr mutations, renames, etc to handle slight nuances in files and column names. In this case, I've included the filename as a column and changed the names of columns to title case, so they are easier to coalesce.
+
+Perfect, let's look at the data:
+```{r}
+kableExtra::kable(tail(raw_data %>% relocate(Filename, .after = last_col())))
+```
+
+Things for the most part of what we want (the NAs are just part of this dataset, some of these coffee details will always be sparse.)
+
+The biggest issue is this:
+```{r echo=TRUE}
+nrow(raw_data %>% select(-Filename) %>% distinct())
+```
+(and this is slightly inflated!)
+
+This on the surface doesn't seem like too big of a deal, but there is a ton of diversity in all of these columns, and, despite my best efforts, needs a ton of cleaning to be sensibly transformed for a model.
+
+Let's pretend that cleaning was instantaneous and there wasn't a bunch of code that I haven't shown here, to show some examples.
+```{r}
+#tasting note folder
+tasting_folder = "inputs/data/Conformed/"
+
+#tasting notes from the SCAA plus my own additions
+SCAA_Notes = readxl::read_xlsx(here::here(tasting_folder,'SCAA_TastingNotes.xlsx'))
+
+#stem the tasting notes in the SCAA wheel, since we don't really want to have to deal with "berry" vs "berries"
+SCAA_Notes <- SCAA_Notes %>% 
+  mutate(l_note = str_to_lower(Note)) %>% 
+  mutate(l_note = str_trim(l_note, side = c("both", "left", "right"))) %>% 
+  mutate(l_note = SnowballC::wordStem(l_note)) 
+```
+
+```{r}
+#this is still in progress ... if you're reading the RMD instead of the HTML, act like this is "data science magic"
+
+#for some regex later
+ripes = tibble(words=c('red','yellow','pink','black','white','orange'))
+
+#this will resolve the Sey issue, essentially I needed to manually update tasting notes, but will want to keep 
+#appending data to the top of it, which isn't necessary to build yet, so this is framework
+oldest_sey = raw_data %>% 
+  unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  filter(Filename %like% 'SeyArchive') %>% 
+  group_by(Filename) %>% 
+  arrange_(~ desc(Filename)) %>% 
+  filter(group_indices() == 1) %>% 
+  ungroup()
+newer_seys = raw_data %>% 
+  unite(Variety, c(Variety, Varietal)) %>% 
+  unite(Processing, c(Processing, Process)) %>% 
+  filter(Filename %like% 'SeyArchive') %>% 
+  group_by(Filename) %>% 
+  arrange_(~ desc(Filename)) %>% 
+  filter(group_indices() != 1) %>% 
+  ungroup()
+
+sey_achive = oldest_sey #plus the anti join logic later, which hasn't been built yet
+sey_achive = sey_achive %>% 
+  select(-Url, -Filename, -J, -Procesing) %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+
+#processing the data a bit, mostly just seperating into TastingNotes and then Processing values
+data = raw_data %>% 
+  filter(Filename %like% 'SeyArchive' == FALSE) %>% 
+  unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  select(-Url, -Filename, -J, -Procesing) %>% 
+  distinct() %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+
+#join the sey back in
+data = rbind(data,sey_achive)
+
+#stem the tasting notes, since we don't really want to have to deal with "berry" vs "berries"
+data = data %>%
+  mutate(TastingNote1 = str_trim(TastingNote1, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote1 = SnowballC::wordStem(TastingNote1)) %>% 
+  mutate(TastingNote2 = str_trim(TastingNote2, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote2 = SnowballC::wordStem(TastingNote2)) %>% 
+  mutate(TastingNote3 = str_trim(TastingNote3, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote3 = SnowballC::wordStem(TastingNote3)) 
+
+#it's common for both procesing and variety to refer to ripeness: Black Honey, Red Caturra
+data = data %>% mutate(Processing = str_to_lower(Processing)) %>% 
+  mutate(Red = str_extract(Processing, "red")) %>% 
+  mutate(Yellow = str_extract(Processing, "yellow")) %>%
+  mutate(Pink = str_extract(Processing, "pink")) %>%
+  mutate(Black = str_extract(Processing, "black")) %>%
+  mutate(White = str_extract(Processing, "white")) %>% 
+  mutate(Orange = str_extract(Processing, "orange")) 
+
+#same as before for variety but we won't update the colour if it was already in the processing note 
+data = data %>% mutate(Variety = str_to_lower(Variety)) %>% 
+  mutate(Red = ifelse(is.na(data$Red), str_extract(Variety, "red"), Red)) %>% 
+  mutate(Yellow = ifelse(is.na(data$Yellow), str_extract(Variety, "yellow"), Yellow)) %>%
+  mutate(Pink = ifelse(is.na(data$Pink), str_extract(Variety, "pink"), Pink)) %>%
+  mutate(Black = ifelse(is.na(data$Black), str_extract(Variety, "black"), Black)) %>%
+  mutate(White = ifelse(is.na(data$White), str_extract(Variety, "white"), White)) %>% 
+  mutate(Orange = ifelse(is.na(data$Orange), str_extract(Variety, "orange"), Orange)) 
+
+#this works out the mean in altitude ranges "2000-2200" = "2100"
+data = data %>% mutate(Altitude = sapply(strsplit(data$Altitude, split = "-", fixed = TRUE), function(k) mean(as.numeric(k))))
+
+#remove the ripeness words from the processing and variety because we've stored them in their colour columns
+#Red Caturra becomes Caturra
+data$Processing = str_replace_all(data$Processing, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+data$Variety = str_replace_all(data$Variety, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+
+#parse out the processing, but only keep the first one for now, Natural/Pulped becomes Natural
+data = data %>% mutate(Processing = str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+          Processing,", ", "|"), " - ","|"), "\\/","|"), " and ","|")) %>%   
+    separate(Processing, into = c("Processing1"), sep = "\\|",  remove = FALSE)
+
+#parse out the variety, keep up to four.
+data = data %>% mutate(Variety = str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+          Variety,", ", "|"), " and ","|"), " \\+ ","|"), "and ","|")) %>%   
+    separate(Variety, into = c("Variety1","Variety2","Variety3","Variety4"), sep = "\\|",  remove = FALSE)
+
+#create our ripeness column from all the colour columns
+data = data %>%unite(Ripeness, c(Red, Yellow, Pink, Black, White, Orange), na.rm=TRUE)
+
+#clean up country names
+data = data %>% mutate(Country = str_to_lower(Country))
+
+#connect to the SCAA_Notes table, three times
+#since we have three tasting notes: Strawberry, Cassis, Velvet, we want to grab the Trait and Group from the SCAA_Notes table 
+#we will join each note to the SCAA_Notes individually and then append "1", "2", "3"  to Trait and Group
+#this was a lot easier in SQL, and isn't complex at all despite looking like a lot of code
+merged_data =
+sqldf::sqldf("select d.*, n1.Trait as Trait1, n1.[Group] as Group1
+              ,n2.Trait as Trait2, n2.[Group] as Group2
+              ,n3.Trait as Trait3, n3.[Group] as Group3              
+              from data d
+              left join SCAA_Notes n1 on n1.l_note = d.TastingNote1
+              left join SCAA_Notes n2 on n2.l_note = d.TastingNote2
+              left join SCAA_Notes n3 on n3.l_note = d.TastingNote3")
+```
+
+Here are some Varieties (filtered down to at least five occurrences, otherwise this table would go and on and on...):
+
+```{r}
+kableExtra::kable(merged_data %>% group_by(Variety1) %>% summarize(n= n()) %>% filter(n >= 5))
+```
+
+...and are some processing types (also filtered to five):
+
+```{r}
+kableExtra::kable(merged_data %>% group_by(Processing1) %>% summarize(n= n()) %>% filter(n >= 5))
+```
+
+...and we've got quite a lot of countries this is all spread across (still filtered to five):
+
+```{r}
+kableExtra::kable(merged_data %>% group_by(Country) %>% summarize(n= n()) %>% filter(n >= 5))
+```
+
+### But let's model it anyways!
+
+Alright, so what do we need to do aside from gather more data?
+
+Here are my initial thoughts:
+
+1) do a bunch of data cleaning (already done!)
+2) use a lot fewer variables
+3) filter to fewer unique possible combinations by removing unique or slightly unique coffees altogether
+4) keep the model as simple as possible
+
+Let's give it a go.
+
+We'll ask, "Does it Taste Fruity" (or not) based on Variety, Processing, and Country. 
+
+Fruity is based on Trait, and we'll go ahead and dummy this column using fastDummies, even though future iterations of this model should use Tidymodel's [step_dummy()](https://recipes.tidymodels.org/reference/step_dummy.html) instead. We'll filter down to five again for each column.
+
+```{r, echo=TRUE}
+prep_data = fastDummies::dummy_cols(merged_data, select_columns = "Trait1", remove_selected_columns = TRUE) %>%
+  select(Variety1, Processing1, Country,Trait1_Fruity) 
+
+prep_data = prep_data %>% group_by(Variety1) %>% filter(n() >= 5)
+
+prep_data = prep_data %>% group_by(Processing1) %>% filter(n() >= 5)
+```
+
+fastDummies makes this column an integer (0,1) but Tidymodel binomial models need to be factor.
+I love this combination of ```ifelse()``` in a mutate statement, it's like a ```case_when``` but a bit easier for dealing with two levels. We'll name the factor levels 'absent' and 'present'.
+
+```{r , echo=TRUE}
+prep_data = prep_data %>% 
+  mutate(Trait1_Fruity = ifelse(Trait1_Fruity ==0, 'absent','present') %>% 
+  as.factor() %>% 
+  structure(levels=c('absent','present')), .keep = "unused")
+```
+
+*Model Process*
+
+1) Train Test Split
+2) Set the model to logistic regression and engine to glm
+3) Write our Tidymodel Recipe
+4) Write our Tidymodel Workflow
+5) Fit the model
+6) Predict on our test data
+7) Evaluate
+
+Step 1: Train Test Split. Easy, and much better than the previous ways I've done this.
+```{r echo=TRUE}
+set.seed(555)
+# Put 3/4 of the data into the training set 
+data_split <- initial_split(prep_data, prop = 3/4)
+
+# Create data frames for the two sets:
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+```
+
+Step 2: Set the model to logistic regression and engine to glm. Also easy, just have to look up the [options](https://www.tidymodels.org/find/parsnip/).
+```{r echo=TRUE}
+lr_mod = 
+  logistic_reg() %>% 
+  set_engine("glm") 
+```
+
+3: Write our Tidymodel Recipe. The tutorial was a big help for this.
+
+The ```recipe()``` syntax is pretty normal.
+
+The ```step_dummy()``` is a nice alternative to using fastDummies
+
+It's good to summarize the outcome of the recipe so you understand what's happening.
+```{r echo=TRUE}
+lr_recipe <- 
+  recipe(Trait1_Fruity ~ ., data = train_data) %>% 
+  step_dummy(all_nominal(), -all_outcomes())
+
+summary(lr_recipe)
+```
+
+Step 4: Write our Tidymodel Workflow. 
+
+Add the model, add the recipe. Nothing too complicated here (yet!)
+```{r echo=TRUE}
+lr_workflow <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(lr_recipe)
+lr_workflow
+```
+
+Step 5: Fit the model
+```{r echo=TRUE}
+lr_fit <- 
+  lr_workflow %>% 
+  fit(data = train_data)
+```
+
+So, how'd it do?
+
+(Remember that spoiler...not great).
+```{r echo=TRUE}
+kableExtra::kable(lr_fit %>% 
+  pull_workflow_fit() %>% 
+  tidy())
+```
+
+Step 6: Predict on our test data
+
+We'll do two types of prediction, first just examine what the predicted class label was (.pred_class) up against the test_data's actual values (Trait1_Fruity). The second will add the probability of that class label so we can do a ROC curve during evaluation.
+
+```{r echo=TRUE}
+pred = predict(lr_fit, test_data) %>% 
+  bind_cols(test_data %>% select(Variety1, Processing1, Country, Trait1_Fruity))
+
+pred_ROC <- 
+   predict(lr_fit, test_data, type = "prob") %>% 
+   bind_cols(test_data %>% select(Variety1, Processing1, Country, Trait1_Fruity)) 
+```
+
+Step 7: Evaluate
+
+ROC Curve, compared to "not fruity": 
+
+```{r echo=TRUE}
+pred_ROC %>% 
+  roc_curve(truth = Trait1_Fruity, .pred_absent) %>% 
+  autoplot()
+```
+
+...and a confusion matrix:
+
+```{r echo=TRUE}
+conf_mat(pred, truth = Trait1_Fruity, estimate = .pred_class)
+```
+
+...and if we weren't suffering enough, let's just see how bad our model accuracy is.
+
+```{r echo=TRUE}
+accuracy(pred, truth = Trait1_Fruity, estimate = .pred_class)
+```
+
+Well, at least it's not a 50|50 tossup.
+
+There we have it, a bad, but working Tidymodel binomial model. 
+
+I think I'll just end this with, "more later..."
