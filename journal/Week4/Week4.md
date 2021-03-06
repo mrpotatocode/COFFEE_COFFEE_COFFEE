@@ -1,0 +1,167 @@
+Week4
+================
+Thomas Rosenthal
+06/02/2021
+
+## Weekly Reflection, Implementing GitHub actions
+
+As a follow-up to last week’s work, [My lesson in HTML node
+picking](https://github.com/mrpotatocode/COFEE_COFFEE_COFFEE/tree/main/journal/Week3),
+this week’s reflection will discuss the implementation of html scraping
+scripts in conjunction with Github Actions to run automatically on a
+scheduled basis.
+
+This concept follows the work of Simon Couch: [Running R Scripts on a
+Schedule with GitHub
+Actions](https://blog.simonpcouch.com/blog/r-github-actions-commit/).
+Being fairly new to this process, this reflection may later be realized
+to contain misunderstandings of the process, but in general shows a more
+complex example of Simon’s concept in production. Without rehashing too
+much of Simon’s walkthrough, I will instead aim to blend some of my
+lessons learned, within the broader tasks Simon describes in detail.
+
+### What to do first
+
+**Fork Simon’s repo:
+<https://github.com/simonpcouch/scheduled-commit-action>**: Starting
+with Simon’s Repo was easier than starting my own, as you might expect.
+The goal in your first pass should be to get your script executed, above
+all else.
+
+**Modify the DESCRIPTION file**: This is necessary to include any
+packages you might use.
+
+**Replace job.R with your script**: Though it’s not overly difficult to
+rename the scripts in the GitHub Action YML, it just makes it easier to
+start with job.R and the tweak things in your own repo after you’ve run
+through the process once or twice. One thing that isn’t made clear in
+Simon’s write-up, it does seem you need to include your packages as you
+would normally, in addition to establishing their presence in the
+DESCRIPTION.
+
+    library(lubridate)
+    library(dplyr)
+    library(tidyr)
+    library(readr)
+    library(tibble)
+    library(data.table)
+    library(rvest)
+    library(stringr)
+    library(here)
+
+**Build your directories on Github**: If you’re saving anything to any
+subfolders, establish the structure (add the folders with a .gitignore
+in them) before you run any of your saving scripts.
+
+You can also write dir.create commands in your R script, for example:
+
+    dir.create('R/inputs/data', recursive=TRUE)
+    dir.create('R/outputs/')
+
+### Modify the YML
+
+If you’re lucky enough to have Github recommend you an R template, use
+it. Other templates are
+[here](https://github.com/r-lib/actions/tree/master/examples#readme). I
+had some difficulties with Simon’s exact YML, so I’ve merged the two.
+
+Here are some differences between the two:
+
+**1)** name. This is my top command, and though it’s not necessary, if
+you’re going to run more than a one Github action, make sure you know
+which is which. No indentation.
+
+    name: 000_Scrape
+
+**2)** jobs. The template build was much simpler, and simply specified
+that I wanted r-version: \[3.6\].
+
+Simon’s must be dynamic to different OSs, but I had some trouble getting
+things to work properly. Note the indentation.
+
+    jobs:
+      build:
+        runs-on: macOS-latest
+        strategy:
+          matrix:
+            r-version: [3.6]
+
+**3)** packages. I consistently had issues with tidyverse. Within
+install dependencies, I wrote a line to install it from CRAN, though
+this may have been unnecessary. The DESCRIPTION file should handle this
+automatically, but my difficulty with tidyverse led me listing out
+packages like *dplyr*, *tidyr*, *readr*, etc within the DESCRIPTION file
+separately, rather than as tidyverse.
+
+Regardless, this seemed to make the problem go away. This is indented
+twice as it is within jobs, steps.
+
+``` 
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("tidyverse")
+        shell: Rscript {0}
+```
+
+**4)** session info. If you’re using packages, move Simon’s session info
+to after Install dependencies. That way if it fails, you can check to
+see that packages were properly loaded.
+
+``` 
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+```
+
+### Set the CRON to ~20 minutes
+
+    on:
+      schedule:
+        - cron: "0/20 * * * *"
+
+As Simon mentions, it’s hard to really understand exactly when Github
+Actions kick off for the first time. It seemed to vary for me, somewhere
+between 20 minutes and an hour for the first version.
+
+My lesson learned here was that failed jobs due to scripting issues need
+to rerun on their own, rather than being prompted with the rerun drop
+down. It seems that whatever was written in job.R when the job kicked
+off, is what it will run with, even if you recommit an updated file to
+the Repo. 20 minutes was a nice threshold for me – it let me make tweaks
+to my script (add a line, fix a bug, etc), push it to the repo, and then
+wait for it to run. You could set it for faster, but the dependencies
+sometimes take 10 minutes to run. While you’re iterating, you sort of
+continuously make updates, push, allow it to run, check the results,
+make changes, etc.
+
+**Remember to set the CRON back to something more reasonable when you’re
+successful**.
+
+### Fix your errors and trust yourself
+
+These might seem obvious, but this was my troubleshooting process:
+
+Be patient. Let things run on their own and do other things while its
+running. *A watched pot doesn’t boil – a watched Github action doesn’t
+finish. Something like that?*
+
+Have someone else run the script locally on their machine. Thanks Paul.
+
+Copy your template down to a notepad, and be willing delete workflows
+and try them again. This was honestly my biggest surprise. Deleting YML
+files and dropping minor changes in seemed much more efficient than
+trying to change them and have them rerun.
+
+Trust that you are doing it right. In general, the Github Action process
+can be a fairly simple one and Simon does a fantastic job laying the
+process out. These extra lessons I’ve laid out here hopefully can
+address additional issues encountered. There’s still a ton to be learnt.
+
+Good luck. My final product is
+[here](https://github.com/mrpotatocode/Automatic_Drip), running every
+week. I’m really enjoying this solution. My thanks to Simon’s amazing
+work\!
