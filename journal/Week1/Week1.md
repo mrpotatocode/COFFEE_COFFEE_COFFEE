@@ -6,7 +6,7 @@ Thomas Rosenthal
 ## Weekly Reflection: Getting Started
 
 Things are started\! I’ve built a scraper for data on Eight Ounce
-Coffee’s (website)\[<https://eightouncecoffee.ca/>\]. I’ve focused on
+Coffee’s [website](https://eightouncecoffee.ca/). I’ve focused on
 Coffee’s from The Library Speciality Coffee (TLS) here in Toronto.
 
 The basic concept is:
