@@ -1,6 +1,7 @@
 Week7
 ================
 Thomas Rosenthal
+
 05/03/2021
 
 ## Weekly Reflection: First Tidy Model
