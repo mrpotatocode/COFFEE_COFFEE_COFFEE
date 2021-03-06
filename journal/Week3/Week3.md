@@ -21,7 +21,7 @@ that each coffee was grown. We see that this information isn’t listed on
 the collection
 page.
 
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/TLS.png" width="40%" />
+<img src="/imgs/TLS.png" width="40%" />
 
 We’ll need to navigate to each coffee’s page, extract the **Altitude**,
 write it to a table (assumedly with the coffee name, region, processing,
@@ -31,7 +31,7 @@ process.
 Our example coffee, Bensa Segera from Ethiopia, was grown at *2100-2300
 m*:
 
-<img src="/Users/thomas/Documents/GitHub/COFFEE_COFFEE_COFFEE/journal/Week3/imgs/bensa.png" width="45%" />
+<img src="/imgs/bensa.png" width="45%" />
 
 Using
 [rvest](https://blog.rstudio.com/2014/11/24/rvest-easy-web-scraping-with-r/),
