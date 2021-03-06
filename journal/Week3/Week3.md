@@ -21,7 +21,10 @@ that each coffee was grown. We see that this information isn’t listed on
 the collection
 page.
 
-<img src="/imgs/TLS.png" width="40%" />
+
+![TLS](imgs/TLS.png)<!-- -->
+
+<img src="imgs/TLS.png" width="40%" />
 
 We’ll need to navigate to each coffee’s page, extract the **Altitude**,
 write it to a table (assumedly with the coffee name, region, processing,
