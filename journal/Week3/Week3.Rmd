@@ -3,8 +3,8 @@ title: "Week3"
 author: "Thomas Rosenthal"
 date: "28/01/2021"
 output:
-  html_document: default
-  pdf_document: default
+  github_document:
+    html_preview: false
 ---
 
 ```{r setup, echo=FALSE}
