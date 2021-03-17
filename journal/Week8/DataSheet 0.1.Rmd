@@ -99,7 +99,7 @@ No. Even with the name of these individuals, no demographic data is kept with th
 
 ### Is it possible to identify individuals (i.e., one or more natural persons), either directly or indirectly (i.e., in combination with other data) from the dataset?
 
-Yes. It is possible to know the names or farmers and producers who contributed to the coffee, but only if provided by the roasters. These names are sometimes accompanied by a personal story and/or anecdote about their life as it relates to coffee. It is presumed that these stories are intended to be read, and that these stories were given to roasters with informed consent. It might be possible to learn of specific locations of these farms within a region.
+Yes. It is possible to know the names of farmers and producers who contributed to the coffee, but only if provided by the roasters. These names are sometimes accompanied by a personal story and/or anecdote about their life as it relates to coffee. It is presumed that these stories are intended to be read, and that these stories were given to roasters with informed consent. It might be possible to learn of specific locations of these farms within a region.
 
 ### Does the dataset contain data that might be considered sensitive in any way (e.g., data that reveals racial or ethnic origins, sexual orientations, religious beliefs, political opinions or union memberships, or locations; financial or health data; biometric or genetic data; forms of government identification, such as social security numbers; criminal history)?
 
