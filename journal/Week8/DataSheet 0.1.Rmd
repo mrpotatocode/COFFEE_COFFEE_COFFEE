@@ -57,7 +57,7 @@ Yes, there are multiple labels associated with each instance. The labels are tas
 
 ### Is any information missing from individual instances?
 
-In its current form, highly quantitative data (such as stories) is captured in HTML files, but not brought into CSV files (which are used to create this dataset). Additionally, some attributes are not presented consistently across roasters or across weeks. Webscraping assumes a degree of stagnant form, so high variance can cause attributes to be missed. Many coffees are presented with the same standard set of attributes, but almost no coffee is presented with all possible attributes (e.g. some roasters may list a completely unique attribute). Depending on sparseness, some attributes are not used in models, but the data is still generally collected. 
+In its current form, highly qualitative data (such as stories) is captured in HTML files, but not brought into CSV files (which are used to create this dataset). Additionally, some attributes are not presented consistently across roasters or across weeks. Webscraping assumes a degree of stagnant form, so high variance can cause attributes to be missed. Many coffees are presented with the same standard set of attributes, but almost no coffee is presented with all possible attributes (e.g. some roasters may list a completely unique attribute). Depending on sparseness, some attributes are not used in models, but the data is still generally collected. 
 
 ### Are relationships between individual instances made explicit?
 
