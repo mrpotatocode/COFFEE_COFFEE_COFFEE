@@ -1,0 +1,286 @@
+---
+title: "draft_multi_model"
+author: "Thomas Rosenthal"
+date: "21/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+#library(drake)
+library(tidymodels)
+library(tidyverse)
+library(rvest)
+library(data.table)
+library(readxl)
+library(SnowballC)
+library(here)
+```
+
+```{r}
+#function for fread (data.table)
+read_plus <- function(flnm) {
+    read_csv(flnm) %>% 
+        mutate(filename = flnm) %>% 
+        rename_with(str_to_title)}
+
+#tasting note folder
+tasting_folder = "inputs/data/Conformed/"
+```
+
+```{r}
+SCAA_Notes = 
+  #load tasting notes
+    read_xlsx(here::here(tasting_folder,'SCAA_TastingNotes.xlsx'))
+```
+
+```{r}
+#build check dataframe
+SCAA_Note_check = SCAA_Notes %>% 
+mutate(note =  str_to_lower(Note), .keep="none")%>% 
+mutate(note = str_trim(note, side = c("both", "left", "right"))) %>% 
+
+#remove plurals, basic stemming
+mutate(note = wordStem(note)) %>% 
+select(note)
+```
+
+```{r}
+  #load all data and merge it at once
+  #amazing writeup on how to do this here: https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once
+  raw_data = 
+    list.files(path = "../Automatic_Drip/R/outputs/",
+      pattern = "*.csv",
+      full.names = T) %>% 
+    map_df(~read_plus(.))
+  
+```
+
+```{r}  
+  #check for missing notes
+  check_missing_note = 
+    raw_data %>% separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE) %>%
+      select(TastingNote1,TastingNote2,TastingNote3) %>% 
+      gather(key, TastingNotes) %>% 
+      select(-key) %>% 
+      mutate(note =  str_to_lower(TastingNotes), .keep="none") %>% 
+      mutate(note = str_trim(note, side = c("both", "left", "right"))) %>% 
+      mutate(note = wordStem(note)) %>% 
+      distinct() %>% 
+      left_join(SCAA_Note_check %>% transmute(note,note, check = 'yes')) %>%
+      replace_na(list(check = 'no')) %>% 
+      filter(check == 'no')
+```
+```{r}
+#this will resolve the Sey issue, when done
+oldest_sey = raw_data %>% unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  filter(Filename %like% 'SeyArchive') %>% group_by(Filename) %>% arrange_(~ desc(Filename)) %>% filter(group_indices() == 1) %>% ungroup()
+
+newer_seys = raw_data %>% unite(Variety, c(Variety, Varietal)) %>% 
+  unite(Processing, c(Processing, Process)) %>% 
+  filter(Filename %like% 'SeyArchive') %>% group_by(Filename) %>% arrange_(~ desc(Filename)) %>% filter(group_indices() != 1) %>% ungroup()
+
+#plyr::match_df(newer_seys %>% select(Roaster, Coffeename, Region, Producer, Variety, Processing), 
+   #                 oldest_sey %>%  select(Roaster, Coffeename, Region, Producer, Variety,Processing))
+
+#anti_join(newer_seys %>% select(Roaster, Coffeename, Producer, Variety, Processing), 
+ #                   oldest_sey %>%  select(Roaster, Coffeename, Producer, Variety,Processing))
+
+sey_achive = oldest_sey #plus the anti join logic later
+sey_achive = sey_achive %>% select(-Url, -Filename, -J, -Procesing) %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+```
+
+
+```{r}
+ripes = tibble(words=c('red','yellow','pink','black','white','orange'))
+
+data = raw_data %>% filter(Filename %like% 'SeyArchive' == FALSE) %>% unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  select(-Url, -Filename, -J, -Procesing) %>% distinct() %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+data = rbind(data,sey_achive)
+
+data = data %>%
+  mutate(TastingNote1 = str_trim(TastingNote1, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote1 = wordStem(TastingNote1)) %>% 
+  mutate(TastingNote2 = str_trim(TastingNote2, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote2 = wordStem(TastingNote2)) %>% 
+  mutate(TastingNote3 = str_trim(TastingNote3, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote3 = wordStem(TastingNote3)) 
+
+data = data %>% mutate(Processing = str_to_lower(Processing)) %>% 
+  mutate(Red = str_extract(Processing, "red")) %>% 
+  mutate(Yellow = str_extract(Processing, "yellow")) %>%
+  mutate(Pink = str_extract(Processing, "pink")) %>%
+  mutate(Black = str_extract(Processing, "black")) %>%
+  mutate(White = str_extract(Processing, "white")) %>% 
+  mutate(Orange = str_extract(Processing, "orange")) 
+
+data = data %>% mutate(Variety = str_to_lower(Variety)) %>% 
+  mutate(Red = ifelse(is.na(data$Red), str_extract(Variety, "red"), Red)) %>% 
+  mutate(Yellow = ifelse(is.na(data$Yellow), str_extract(Variety, "yellow"), Yellow)) %>%
+  mutate(Pink = ifelse(is.na(data$Pink), str_extract(Variety, "pink"), Pink)) %>%
+  mutate(Black = ifelse(is.na(data$Black), str_extract(Variety, "black"), Black)) %>%
+  mutate(White = ifelse(is.na(data$White), str_extract(Variety, "white"), White)) %>% 
+  mutate(Orange = ifelse(is.na(data$Orange), str_extract(Variety, "orange"), Orange)) 
+
+data = data %>% mutate(Altitude = sapply(strsplit(data$Altitude, split = "-", fixed = TRUE), function(k) mean(as.numeric(k))))
+
+data$Processing = str_replace_all(data$Processing, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+data$Variety = str_replace_all(data$Variety, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+
+data = data %>% mutate(Processing = str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+          Processing,", ", "|"), " - ","|"), "\\/","|"), " and ","|")) %>%   
+    separate(Processing, into = c("Processing1"), sep = "\\|",  remove = FALSE)
+
+data = data %>% mutate(Variety = str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+          Variety,", ", "|"), " and ","|"), " \\+ ","|"), "and ","|")) %>%   
+    separate(Variety, into = c("Variety1","Variety2","Variety3","Variety4"), sep = "\\|",  remove = FALSE)
+
+data = data %>%unite(Ripeness, c(Red, Yellow, Pink, Black, White, Orange), na.rm=TRUE)
+
+data = data %>% mutate(Country = str_to_lower(Country))
+```
+
+```{r}
+#data %>% filter(is.na(Country) == TRUE)
+```
+
+
+```{r}
+SCAA_Notes <- SCAA_Notes %>% 
+mutate(l_note =  str_to_lower(Note))%>% 
+mutate(l_note = str_trim(l_note, side = c("both", "left", "right"))) %>% 
+
+#remove plurals, basic stemming
+mutate(l_note = wordStem(l_note)) 
+```
+
+
+```{r}
+merged_data =
+sqldf::sqldf("select d.*, n1.Trait as Trait1, n1.[Group] as Group1
+              ,n2.Trait as Trait2, n2.[Group] as Group2
+              ,n3.Trait as Trait3, n3.[Group] as Group3              
+              from data d
+              left join SCAA_Notes n1 on n1.l_note = d.TastingNote1
+              left join SCAA_Notes n2 on n2.l_note = d.TastingNote2
+              left join SCAA_Notes n3 on n3.l_note = d.TastingNote3")
+```
+
+```{r}
+merged_data %>% select(Tastingnotes,TastingNote2,Trait2,Group2,TastingNote3,Trait3,Group3) %>% distinct() %>%  
+  filter(is.na(Trait2))
+```
+
+```{r}
+head(merged_data)
+```
+```{r}
+##TRAIT 1
+prep_data = merged_data %>% select(Trait1, Variety1, Processing1, Country) 
+
+prep_data = prep_data %>% group_by(Variety1) %>% 
+            filter(n() >= 5) 
+
+prep_data = prep_data %>% group_by(Processing1) %>% 
+            filter(n() >= 5) 
+prep_data = prep_data %>% drop_na(Trait1)
+```
+
+
+```{r}
+##TRAIT 1
+prep_data = merged_data %>% select(Group1, Variety1, Processing1, Country) 
+
+prep_data = prep_data %>% group_by(Variety1) %>% 
+            filter(n() >= 5) 
+
+prep_data = prep_data %>% group_by(Processing1) %>% 
+            filter(n() >= 5) 
+prep_data = prep_data %>% drop_na(Group1)
+```
+
+```{r}
+#Rsample pacakge example 
+## Create the train and test sets using Rsample
+set.seed(42)
+tidy_split <- initial_split(prep_data, prop = .75)
+tidy_train <- training(tidy_split)
+tidy_test <- testing(tidy_split)
+tidy_kfolds <- vfold_cv(tidy_train)
+```
+
+```{r}
+#Recipes package 
+## For preprocessing, feature engineering, and feature elimination 
+tidy_rec <- recipe(Group1 ~., data = tidy_train) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors())
+
+summary(tidy_rec)
+```
+
+```{r}
+# Parsnip package 
+## Standardized api for creating models 
+tidy_boosted_model <- boost_tree(trees = tune(),
+                                min_n = tune(),
+                                learn_rate = tune()) %>% 
+  set_mode("classification") %>% 
+  set_engine("xgboost")
+```
+
+```{r}
+# Dials creates the parameter grids 
+# Tune applies the parameter grid to the models 
+# Dials pacakge 
+boosted_grid <- grid_regular(parameters(tidy_boosted_model), levels = 4)
+
+# Tune pacakge 
+boosted_tune <- tune_grid(tidy_boosted_model,
+          tidy_rec,
+          resamples = tidy_kfolds,
+          grid = boosted_grid)
+
+#Use Tune package to extract best parameters using ROC_AUC handtill
+boosted_param <- boosted_tune %>% select_best("roc_auc")
+
+#Apply parameters to the models
+tidy_boosted_model <- finalize_model(tidy_boosted_model, boosted_param)
+```
+
+```{r}
+# Workflow package 
+# For combining model, parameters, and preprocessing
+boosted_wf <- workflow() %>% 
+  add_model(tidy_boosted_model) %>% 
+  add_recipe(tidy_rec)
+```
+
+```{r}
+# Yardstick package
+# For extracting metrics from the model 
+boosted_res <- last_fit(boosted_wf, tidy_split)
+bind_rows(
+  boosted_res %>% mutate(model = "xgb")) %>% 
+  unnest(.metrics)
+boosted_res %>% unnest(.predictions) %>% 
+  conf_mat(truth = Group1, estimate = .pred_class)
+```
+
+```{r}
+# Fit the entire data set using the final wf 
+final_boosted_model <- fit(boosted_wf, prep_data)
+#saveRDS(final_boosted_model, "../outputs/models/xboost_coffee_trait1.rds")
+saveRDS(final_boosted_model, "../outputs/models/xboost_coffee_group1.rds")
+```
+
+

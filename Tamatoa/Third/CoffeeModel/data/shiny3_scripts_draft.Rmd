@@ -1,0 +1,39 @@
+---
+title: "shiny3_scripts_draft"
+author: "Thomas Rosenthal"
+date: "21/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(tidymodels)
+library(rvest)
+library(data.table)
+library(readxl)
+library(SnowballC)
+library(here)
+```
+
+
+```{r}
+#function for fread (data.table)
+read_plus <- function(flnm) {
+    read_csv(flnm) %>% 
+        mutate(filename = flnm) %>% 
+        rename_with(str_to_title)}
+
+#tasting note folder
+tasting_folder = "inputs/data/Conformed/"
+
+SCAA_Notes = 
+  #load tasting notes
+    read_xlsx(here::here(tasting_folder,'SCAA_TastingNotes.xlsx'))
+```
+
+
