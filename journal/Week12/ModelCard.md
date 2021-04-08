@@ -75,7 +75,7 @@ shown:
 
   - Final accuracy is calculated through boolean truth table logic based
     on XGBoost predictions for the set of possibilities. Where
-    \(\frac{\sum(_⊤)}n\) = Accuracy (.66 for this
+    ![formula](https://render.githubusercontent.com/render/math?math=\frac{\sum(\top)}n) = Accuracy (.66 for this
     example)
     
     | .pred       | .truth1      | .truth2     | .truth3     | .bool1 | .bool2 | .bool3 |
