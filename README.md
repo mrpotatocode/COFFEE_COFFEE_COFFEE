@@ -13,7 +13,7 @@ This ~~will be~~ is a repo for my coffee project.
 - [x] Learn webscraping with [`rvest`](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week3/Week3.md)
 - [x] Collect data [(plural)](https://github.com/mrpotatocode/Automatic_Drip)
 - [x] Learn [GitHub Actions](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week4/Week4.md)
-- [x] Deploy GitHub Actions for automated and scheduled webscraping (https://github.com/mrpotatocode/Automatic_Drip/tree/main/.github/workflows)
+- [x] Deploy GitHub Actions for automated and scheduled [webscraping](https://github.com/mrpotatocode/Automatic_Drip/tree/main/.github/workflows)
 - [x] Learn [Shiny](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week5/Week5.md)
 - [x] Deploy my first [Shiny app](https://mrpotatocode.shinyapps.io/FavouriteCoffees/)
 - [x] Learn [tidymodels](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week7/Week7.md)
