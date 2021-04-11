@@ -1,0 +1,211 @@
+---
+title: |
+  ![](mrpotatocode_banner.png){width=7in}  
+  Coffee & Machine Learning: An Exploration into the Attributes that Define Single-Origin Coffees
+author: "Thomas Rosenthal"
+date: "April 1, 2021"
+output:
+  github_document:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document:
+    latex_engine: xelatex
+nocite: '@*'
+bibliography: references.bib
+csl: apa-6th-edition.csl
+thanks: 'Code and data are available at: [github.com/mrpotatocode/COFFEE_COFFEE_COFFEE](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE)'
+abstract: Coffee machine learning goes brrrrrrrrrrrrew me another cup
+urlcolor: blue
+always_allow_html: true
+---
+
+\newpage
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+options(scipen=99999)
+```
+
+
+```{r libraries}
+library(tidyverse)
+library(data.table)
+library(here)
+library(kableExtra)
+library(ggplot2)
+```
+
+## Introduction
+
+How can a small seed be enjoyed by the entire world with so little interest in its origin? Coffee is consumed in every country, is the seventh most valuable agricultural product (Pendergrast, 2010), and supports the livelihood of 125 million people (Hoffmann, 2018). In many places, the daily coffee ritual signifies a start to the day and a nod to the productive buzz it imbues its consumer. Our appreciation for coffee has helped shape a complex landscape of horticulture, chemistry, food science, and globalised import-export economics. As a result, coffee has never tasted better. Our collective understanding of coffee information has led to phenomenal quality coffee beans and annual championships celebrating the labour and toil of farmers, producers, roasters, and baristas across the world.
+
+### Background
+
+This project sits at the intersection of two apparently disparate fields of great personal interest: coffee and data science. In 2016, I began keeping a journal of each distinct coffee I brewed and became endlessly fascinated with the variance in flavours I was able to produce. Over time, deciding which bag of beans to purchase next felt like a math problem¬—with so many options, all of them ripe with detail, I began to dream of a model to pick the best bean at any given moment. This proposed exploratory research aims to do just that, by examining whether a specialty coffee’s tasting notes can be predicted with machine learning models based on its attributes. 
+
+### Terminology	
+
+As the world’s appetite for coffee has grown, the coffee industry's "Third Wave" movement has flourished. The movement aims to treat coffee as an artisanal product that is carefully curated, where coffee quality is maximized at each stage: farming, producing, roasting, and selling (Rosenberg et al., 2018). There is an “obsession” with coffee’s taste and an often-altruistic approach to conducting business (Pendergrast, 2010). At its pinnacle, single-origin specialty coffee exists beyond a means to caffeinate and instead engages an increasingly discerning consumer.
+
+Under the umbrella term, "Third Wave", coffees within this project are those that have been produced at a "single origin:" coffee that is sourced from a single producer, farm, or crop. These coffees are further graded as "speciality coffee": coffee of the species Coffea arabica that is within the top 20% of graded coffee produced worldwide. Two grading systems are generally utilized: Q-grading, as defined by the Specialty Coffee Association of America (SCAA), and sieve grading, where larger beans are generally preferred (with the exception of single-seed “peaberry” coffees). Different countries utilize different grades (e.g. ‘AA,’ 16+, ‘Strictly High Grown,’ ‘Extra Fancy’) but top grades are well distinguished from middle- and commodity-grade coffees. 
+
+Single-origin coffees are intended to be traceable, meaning consumers are privy to the production cycle before purchase. This data is represented by a core of common attributes: 1) Country and region of production; 2) Variety; 3) Harvest characteristics; 4) Processing; 5) Taste; and 6) Roast. Full descriptions of these attributes and their definitions can be found in Appendix A.
+
+## Data
+
+### Data Collection
+
+Coffee data was scraped from four websites over the course of three months, comprising 550 coffees from 106 roasters. Data scraping varied by website format: some websites organized each coffee by roaster, so several scrapers were built to scrape data from roasters with consistent formatting across weeks; others were large collections of coffees that were scraped in entirity from top to bottom. Websites were selected by ease of scraping and quality of coffee offerings. Scrapers were generally run once a week and duplicate coffees were discarded, if there were any. Attributes varied by websites and roaster, but core attributes were generally present. Coffees marked as blends and/or decaf were removed.  
+
+These scrapers were automated with GitHub Actions to run on a weekly or monthly basis, depending on the frequency at which the coffees were updated on their respective websites. Each scraper produced a .csv file per roaster or site. These .csv files are then added to the existing data, and any duplicates removed. One website, not suitable for scraping but of excellent data richness, had coffee data manually collected from it. Coffee models became significantly more reliable around ~500 coffees, so this manual collection was necessary to help achieve this within threshold. 
+
+Data Collection proved a major limitation to this project. Coffee data collec should continue throughout the year to accommodate for coffee harvesting sesasons throughout the world. Brazil, the world's largest producer of arabica grade beans, is signficantly underrepresented due to the timing of data collection. Furthermore, scraped websites were inconsitent in their coffee listings. Coffee attributes present in one week were not guarenteed for another, nor was the order in which the attributes listed. Data that was unable to conform to the established standards was discarded before modelling in order to prevent erroneous variable relationships (such as a country being listed as a process.)
+
+#### Dataset
+
+Scraped .csv files were developed to allow for significant variance in coffees. By nature, coffees are curated by humans; their coffee cherries harvested at various ripeness points, their varieties occasionally blended to offset flavours, their processing a collection of mutiple nearby farms. These variables are transparent. Ripeness for example is expressed by colouration (pink, red, yellow, orange, white, black). Many of these variables were collected and then parsed to maximize their informational gain. In total 25 variables were collected. Many of these were extremely sparse (less than 1%) and were not used within models. 
+
+```{r getdata, include=FALSE}
+source(paste0(here::here(),"/scripts/build/01_get_data.R"), local = knitr::knit_global())
+```
+
+```{r cleandata, include=FALSE}
+source(paste0(here::here(),"/scripts/build/02_clean_data.R"), local = knitr::knit_global())
+```
+
+```{r modeldata, include=FALSE}
+source(paste0(here::here(),"/scripts/analyze/03_xgb_model.R"), local = knitr::knit_global())
+```
+
+
+Tasting Notes, stemming
+
+Ripeness, string extraction
+
+First varietal,
+
+Altitude
+
+
+
+
+
+### Data Conformity   
+
+SCAA Tasting Wheel
+  Traits
+  Groups
+  Notes
+  
+```{r}
+citr <- sample(x = SCAA_Notes %>% filter(Trait == 'Fruity') %>% 
+                                 select(Note) %>%unique() %>% unlist(), 
+                                 size = 6, replace = FALSE)
+SCAA_Fake <- subset(SCAA_Notes, Note %in% citr) %>% select(-l_note) %>% mutate(Note = str_to_title(Note))
+kable(SCAA_Fake, caption="Sample SCAA Tasting Wheel Rows", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+```
+
+Subjectivity 
+  Placing Tasting Notes within dataset
+  SCAA standards & tasting is less subjective paper
+
+Variety comparison: https://varieties.worldcoffeeresearch.org/varieties
+
+```{r}
+t1 <- prep_data %>% mutate_all(funs(str_to_title(.))) %>% group_by(Variety1) %>% summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6)
+t2 <- prep_data %>% mutate_all(funs(str_to_title(.))) %>% group_by(Country) %>% summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6)
+t3 <- prep_data %>% mutate_all(funs(str_to_title(.))) %>% group_by(Processing1) %>% summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6)
+
+kable(list(t2,t1,t3),
+      caption="Frequent Varieties, Countries and Proccesses", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(full_width = FALSE, position = "left")
+```
+
+```{r}
+t4 <- unite(prep_data, ItemSet, Country,Variety1,Processing1, sep = " + ") %>% group_by(ItemSet) %>% 
+            summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6) %>% mutate_all(funs(str_to_title(.)))
+kable(t4, caption="Greatest Combination Frequencies", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+
+```
+
+```{r}
+t5 <- data %>% distinct() %>% mutate_all(funs(str_to_title(.)))
+
+kable(unite(t5, ItemSet, Country,Region,Variety1,Processing1, sep = " + ") %>% group_by(ItemSet) %>% 
+            summarize(n = n()) %>% arrange(desc(n)) %>% top_n(5), 
+      caption="Greatest Combination Frequencies with Region", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+```
+
+## Model
+
+XGBoost
+Gradiant Boosted Tree
+
+$\Lambda ( \phi )
+
+$$\Lambda^{(t)} = \sum_{i}\lambda(y_i,\hat{y_i}^{(t-1)} + f_{t}(x_i)) + \Omega(f_{t}) $$
+
+
+
+
+## Results
+
+```{r}
+autoplot(conf_mat_b, type = "heatmap") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r shiny-app}
+knitr::include_app("https://mrpotatocode.shinyapps.io/TastingNotePredictions/", 
+  height = "600px")
+```
+
+
+## Discussion
+
+what you did
+
+findings
+
+learned about the world
+
+implications
+
+next steps
+
+\newpage
+
+## References
+
+<div id="refs"></div>
+
+\newpage
+
+## Appendix A: Single-Origin Coffee Terminology
+
+1) Country and region of production, where the coffee was cultivated. 
+
+2) Variety, the subspecies cultivated through selection (e.g. typica, bourbon, cattura, SL-28, geisha, heirloom). Variety may also be referred to as varietal, a single instance of a variety, for example within a crop or a farm, rather than the subspecies. There are an unknown number of varieties in the world; however, there are a handful of popular, well-identified varieties whose morphologies are well-documented.
+
+3) Harvest characteristics, including the following: ripeness colouration (e.g. black, red, orange, yellow, white—from most to least ripened), farm’s location (latitude and longitude) and terroir (i.e. temperature, rainfall, soil composition, days of sunshine, meters above sea level [MASL]), season of harvest, and picking methods (e.g. hand, stripping, mechanical). Farmers (sometimes called estate owners) control these factors.
+
+4) Processing (dry, wet, honey, pulp) and drying (patio, raised, mechanical) methods. Farmers or producers determine these factors, depending on available infrastructure. In the case where farmers are not able to process and dry their crop, producers (often within co-ops) handle the processing of beans and are thus sometimes considered the “origin” when multiple lots are collected and processed simultaneously.
+
+5) Roast, where all beans have been roasted (i.e. have undergone the Maillard Reaction). Roasters determine duration and temperature. Roasters are occasionally referred to as producers, especially within relationship-coffee purchases. For the sake of simplicity and with due consideration of the effect of roast, the scope of this project will not consider coffee roasted beyond the “first crack.”
+
+6) Taste, as identified by cupping, to identify tasting traits (e.g. sweetness, acidity, mouthfeel, balance, flavour), tasting groups (e.g. citrus, berry, stone fruits, sweet, savoury, floral), and tasting notes (e.g. chocolate, raspberry, lemon, black tea, hazelnut, velvety). Overlap can exist both vertically and horizontally within this hierarchy: sweetness may describe sweet tasting notes like brown or cane sugars; whereas both sweetness and acidity may describe a sweet and citrus taste such as candied lemon. 
+
+\newpage
+
+## Appendix B: Datasheet for Dataset, v0.1
+
+Available here: https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week8/DataSheet-0.1.md 
+
+## Appendix C: Model Card
+
+Available here: https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week12/ModelCard.md 
+
+## Appendix D: 
