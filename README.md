@@ -8,7 +8,7 @@ This ~~will be~~ is a repo for my coffee project.
 ### Current Roadmap
 
 - [x] Drink a lot of coffee 
-- [x] Plan the project
+- [x] [Plan the project](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/plan.md)
 - [x] Put the project on [GitHub](https://knowyourmeme.com/photos/1246322-sweet-jesus-pooh-thats-not-honey) 
 - [x] Learn webscraping with [`rvest`](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week3/Week3.md)
 - [x] Collect data [(plural)](https://github.com/mrpotatocode/Automatic_Drip)
