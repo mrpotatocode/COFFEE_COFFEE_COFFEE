@@ -1,11 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
 
 ###librarys
 library(shiny)
@@ -22,13 +14,16 @@ prep_data <- read_csv("data/shiny_data.csv")
 model <-  readRDS("data/xboost_coffee_group_all_v2.rds")
 
 ###preprocess drop downs
-dropdowns <- prep_data %>% select(Variety1,Processing1,Country) %>% filter(!is.na(Country)) %>% distinct()
+dropdowns <- prep_data %>% select(Variety1,Processing1,Country) %>% filter(!is.na(Country)) %>% distinct() %>% mutate_all(funs(str_to_title))
 
-#unresolved spelling error
-dropdowns <- dropdowns %>% filter(!Country == "etbhiopia")
+#unresolved spelling error,
+dropdowns <- dropdowns %>% filter(!Country == "etbhiopia") 
 
 ###build UI
 ui <- dashboardPage(
+    
+    skin = "green",
+
     header = dashboardHeader(title = "Tasting Note Prediction App"),
     
     sidebar = dashboardSidebar(
@@ -44,21 +39,16 @@ ui <- dashboardPage(
             
                 shinydashboard::box(h3("First: Make Your Parameter Selections"), width = 12),
 
+                shinydashboard::box(h5("Varieties and Processes are Filtered to Relevant Countries"), width = 12),
+                
                 box(title = "Select a Country", selectInput("v_country",label = "Country",
                         choices = dropdowns %>% ungroup() %>% select(Country) %>% distinct() %>% 
-                            arrange(Country) %>% mutate(Country = str_to_title(Country))),
-                            width = 4),
+                            arrange(Country)), width = 4),
                  
-                box(title = "Select a Variety", selectInput("v_var", label = "Variety",
-                        choices = dropdowns %>% ungroup() %>% select(Variety1) %>% distinct() %>% 
-                            arrange(Variety1) %>% mutate(Variety1 = str_to_title(Variety1))),
-                            width = 4),
+                box(title = "Select a Variety", uiOutput("varOutput"), width = 4),
                 
-                box(title = "Select a Process", selectInput("v_proc",  label = "Processing",
-                        choices = dropdowns %>% ungroup() %>% select(Processing1) %>% distinct() %>% 
-                            arrange(Processing1) %>% mutate(Processing1 = str_to_title(Processing1))),
-                            width = 4),
-                           
+                box(title = "Select a Process", uiOutput("procOutput"), width = 4),
+
                 shinydashboard::box(h3("Then: Wait for Model Outcomes"), width = 12),
                 
                 fluidRow(column(12,
@@ -67,7 +57,7 @@ ui <- dashboardPage(
                     valueBoxOutput("Note3_prediction")
                 )),
                 
-                shinydashboard::box(h4("Change Parameter Selections at any Time"), width = 12),
+                shinydashboard::box(h5("Change Parameter Selections at any Time"), width = 12),
             ),
             
             tabItem(tabName = "Details",
@@ -87,6 +77,26 @@ ui <- dashboardPage(
 ###build server functions
 server <- function(input, output) {
 
+    df0 <- eventReactive(input$v_country,{
+        dropdowns %>% filter(Country %in% input$v_country)
+    })
+    
+    output$results <- renderTable({
+        df0()})
+    
+    output$varOutput <- renderUI({
+        selectInput("v_var", "Variety",sort(unique(df0()$Variety1)))
+    })
+    
+    df1 <- eventReactive(input$v_var,{
+        df0() %>% filter(Country %in% input$v_country)
+    })
+    
+    output$procOutput <- renderUI({
+        selectInput("v_proc", "Process",sort(unique(df1()$Processing1)))
+    })
+    
+    
     selected <- reactive({tibble("Variety1" = str_to_lower(input$v_var),
                                 "Processing1" = str_to_lower(input$v_proc),
                                 "Country" = str_to_lower(input$v_country))})
@@ -109,7 +119,7 @@ server <- function(input, output) {
         valueBox(
             value = paste0(round(100*prediction()$value[1], 0), "%"),
             subtitle = paste0("Tasting Group: ", prediction()$note[1] %>% str_remove(".pred_")),
-            #color = prediction_color,
+            color = 'green',
             icon = icon("lemon")
         )
     })
@@ -119,7 +129,7 @@ server <- function(input, output) {
         valueBox(
             value = paste0(round(100*prediction()$value[2], 0), "%"),
             subtitle = paste0("Tasting Group: ", prediction()$note[2] %>% str_remove(".pred_")),
-            #color = prediction_color,
+            color = 'green',
             icon = icon("seedling")
         )
     })
@@ -129,7 +139,7 @@ server <- function(input, output) {
         valueBox(
             value = paste0(round(100*prediction()$value[3], 0), "%"),
             subtitle = paste0("Tasting Group: ", prediction()$note[3] %>% str_remove(".pred_")),
-            #color = prediction_color,
+            color = 'green',
             icon = icon("cookie")
         )
     })
