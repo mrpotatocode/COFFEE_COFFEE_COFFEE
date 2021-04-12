@@ -1,22 +1,24 @@
-# Schedule
-## Week 1 – Plan Research, Initial Literature Review
-Readings
--       Gary King, How to Write a Publishable Paper as a Class Project https://gking.harvard.edu/papers
--       Jesse Shapiro, Four Steps to an Applied Micro Paper https://www.brown.edu/Research/Shapiro/pdfs/foursteps.pdf
--       Riederer, Emily, RMarkdown Driven Development (RmdDD) https://emilyriederer.netlify.com/post/rmarkdown-driven-development/
--       Miyakawa, Tsuyoshi, No raw data, no science: another possible source of the reproducibility crisis, Molecular Brain, https://doi.org/10.1186/s13041-020-0552-2
--       Coffee Literature:
-  -        Conley & Wilson 2018: Coffee Terroir: Cupping Description Profiles and Their Impact Upon Prices in Central American Coffees, GeoJournal; Dordrecht, http://dx.doi.org.myaccess.library.utoronto.ca/10.1007/s10708-018-9949-1
-  -        Gagné, J. (2019, September 2). How Coffee Varietals and Processing Affect Taste [blog]. Retrieved from https://coffeeadastra.com/2019/07/23/how-coffee-varietals-and-processing-affect-taste-2/
-Tasks
+## Schedule
+
+### Week 1 – Plan Research, Initial Literature Review
+#### Readings
+- Gary King, How to Write a Publishable Paper as a Class Project https://gking.harvard.edu/papers
+- Jesse Shapiro, Four Steps to an Applied Micro Paper https://www.brown.edu/Research/Shapiro/pdfs/foursteps.pdf
+- Riederer, Emily, RMarkdown Driven Development (RmdDD) https://emilyriederer.netlify.com/post/rmarkdown-driven-development/
+-  Miyakawa, Tsuyoshi, No raw data, no science: another possible source of the reproducibility crisis, Molecular Brain, https://doi.org/10.1186/s13041-020-0552-2
+- Coffee Literature:
+  - Conley & Wilson 2018: Coffee Terroir: Cupping Description Profiles and Their Impact Upon Prices in Central American Coffees, GeoJournal; Dordrecht, http://dx.doi.org.myaccess.library.utoronto.ca/10.1007/s10708-018-9949-1
+  - Gagné, J. (2019, September 2). How Coffee Varietals and Processing Affect Taste [blog]. Retrieved from https://coffeeadastra.com/2019/07/23/how-coffee-varietals-and-processing-affect-taste-2/
+#### Tasks
 -       Create Research Plan
 -       Conduct Initial Literature Review
 -       Review coffee roaster websites and rank on estimated ease of scraping
-Week 2 – Continue Literature Review, Identify Data, Build First Shiny App
-Readings
+
+### Week 2 – Continue Literature Review, Identify Data, Build First Shiny App
+#### Readings
 -       Wickham, Hadley, 2020, Mastering Shiny, Chapters 2-5.
 -       Jesse Shapiro, Code and Data for the Social Sciences: A Practitioner's Guide https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml
-Tasks
+#### Tasks
 -       Make first shiny app, following tutorial here: https://shiny.rstudio.com/articles/build.html
 -       Setup GitHub Repo.
 -       Setup folders and initial README.
