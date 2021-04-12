@@ -1,5 +1,5 @@
 # Schedule
-Week 1 – Plan Research, Initial Literature Review
+## Week 1 – Plan Research, Initial Literature Review
 Readings
 -       Gary King, How to Write a Publishable Paper as a Class Project https://gking.harvard.edu/papers
 -       Jesse Shapiro, Four Steps to an Applied Micro Paper https://www.brown.edu/Research/Shapiro/pdfs/foursteps.pdf
