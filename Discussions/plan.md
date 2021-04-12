@@ -16,16 +16,16 @@
 
 ### Week 2 – Continue Literature Review, Identify Data, Build First Shiny App
 #### Readings
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 2-5.
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 2-5
 - Jesse Shapiro, Code and Data for the Social Sciences: A Practitioner's Guide https://web.stanford.edu/~gentzkow/research/CodeAndData.xhtml
 #### Tasks
 - Make first shiny app, following tutorial here: https://shiny.rstudio.com/articles/build.html
-- Setup GitHub Repo.
-- Setup folders and initial README.
+- Setup GitHub Repo
+- Setup folders and initial README
 
 ### Week 3 – Finalize Literature Review, Gather Data
 #### Readings
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 2-5
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 7-8
 - Review GitHub actions for scheduled R scripts: https://blog.simonpcouch.com/blog/r-github-actions-commit/
 #### Tasks
 - Build first webscrapers 
@@ -41,7 +41,7 @@
 
 ### Week 5 – Automate Data Gathering, Initial Data Cleaning and Preparation, Build Second Shiny App
 #### Readings
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 8-9.
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 8-9
 #### Tasks
 - Build third webscrapers
 - Make second shiny app (content pending)
@@ -54,8 +54,8 @@
 
 ### Week 6 – Finalize Data Cleaning and Preparation, Conduct Exploratory Data Analysis, Begin Machine Learning Model Development
 #### Readings
-- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 1-5.
-- Wickham, Hadley, and Garrett Grolemund, 2017, R for Data Science, Chapters 2-8.
+- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 1-5
+- Wickham, Hadley, and Garrett Grolemund, 2017, R for Data Science, Chapters 2-8
 #### Tasks
 - Finish any data pipeline/architecture development 
 - Prepare data for machine learning
@@ -70,8 +70,8 @@
 
 ### Week 7 – Continue Machine Learning Model Development
 #### Readings
-- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 6-7.
-- Wickham, Hadley, and Garrett Grolemund, 2017, R for Data Science, Chapters 22-25.
+- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 6-7
+- Wickham, Hadley, and Garrett Grolemund, 2017, R for Data Science, Chapters 22-25
 #### Tasks
 - Design first machine learning model with TidyModels
   - Train/test
@@ -79,15 +79,15 @@
 
 ### Week 8 – Finalize Machine Learning Model Development, Evaluate Results, Build Third Shiny App
 #### Readings
-- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 8-9.
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 10-12.
+- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 8-9
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 10-12
 #### Tasks
 - Continue machine learning development  
 - Explore, script, and compare different machine learning algorithm performance
 
 ### Week 9 – Model Evaluation and Refinement with Data Augmentation
 #### Readings
-- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 10-12.
+- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 10-12
 #### Tasks
 - Hypertune machine learning models to maximize outcomes as best as possible
 - Testing/bootstrapping if not already completed
@@ -97,21 +97,21 @@
 
 ### Week 10 – Finalize Machine Learning Model and Data
 #### Readings
-- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 13-14.
+- Kuhn, Max and Julia Silge, 2021, Tidy Modeling with R, Chapters 13-14
 #### Tasks
 - Evaluate machine learning results, write up realizations and analysis
 - Submit RMD to GitHub Repo 
 
 ### Week 11 – Begin Final Shiny App
 #### Readings
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 13-16.
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 13-16
 #### Tasks
 - Determine and confirm requirements of Shiny App features (filters, content, etc)
 - Begin final shiny app of all coffee data and machine learning models
 
 ### Week 12 – Deploy Model via Shiny App
 #### Readings
-- Wickham, Hadley, 2020, Mastering Shiny, Chapters 17-23.
+- Wickham, Hadley, 2020, Mastering Shiny, Chapters 17-23
 #### Tasks
 - Continue and finish final shiny app
 
