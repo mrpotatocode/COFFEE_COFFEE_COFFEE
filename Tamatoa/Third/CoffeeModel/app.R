@@ -17,7 +17,7 @@ model <-  readRDS("data/xboost_coffee_group_all_v2.rds")
 dropdowns <- prep_data %>% select(Variety1,Processing1,Country) %>% filter(!is.na(Country)) %>% distinct() %>% mutate_all(funs(str_to_title))
 
 #unresolved spelling error,
-dropdowns <- dropdowns %>% filter(!Country == "etbhiopia") 
+dropdowns <- dropdowns %>% filter(!Country == "Etbhiopia") 
 
 ###build UI
 ui <- dashboardPage(
