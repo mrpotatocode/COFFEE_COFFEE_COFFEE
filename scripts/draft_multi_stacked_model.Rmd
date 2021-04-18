@@ -18,6 +18,7 @@ library(data.table)
 library(readxl)
 library(SnowballC)
 library(here)
+library(doFuture)
 ```
 
 ```{r}
@@ -248,7 +249,6 @@ prep_data %>% group_by(Processing1) %>% summarize(n = n())
 ```{r}
 all_cores <- parallel::detectCores(logical = FALSE)
 
-library(doFuture)
 registerDoFuture()
 cl <- parallel::makeCluster(4) #all_cores
 plan(cluster, workers = cl)
@@ -399,7 +399,13 @@ conf_mat_b <- boosted_res %>% unnest(.predictions) %>%
 ```
 
 ```{r}
-autoplot(conf_mat_b, type = "heatmap") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+`<|°_°|>` <-  autoplot(conf_mat_b, type = "heatmap") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+png("../Discussions/imgs/confusion_matrix.png")
+print(`<|°_°|>`)
+dev.off()
+
+`<|°_°|>`
 ```
 
 
