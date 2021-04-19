@@ -115,7 +115,7 @@ kable(SCAA_Fake, caption="Sample SCAA Tasting Wheel Rows", booktabs = TRUE, line
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
   
-```{r lollipops, fig.height=3.3}
+```{r lollipops, out.width="66%", fig.align="center"}
 g <- SCAA_Notes %>% group_by(Trait,Group) %>% summarise(n=n()) %>% arrange(desc(n)) 
 
 ggplot(g, aes(x=reorder(Group, n) ,y =n, colour = Trait, fill = Trait))+
@@ -144,18 +144,19 @@ Additionally, the World Coffee Research program's Arabica Coffee Varieties (2019
 
 Scraped .csv files were flexible enough to allow for significant variance in coffees. By nature, coffees are curated by humans; their coffee cherries harvested at various ripeness points, their varieties occasionally blended to offset flavours, their processing a collection of multiple nearby farms. Producers and roasters make an effort to make these variables as transparent as possible. To create a standarized approach to the information rich data, data extraction focused on specific and recurring features. In total 25 variables were collected. Many of these were extremely sparse (less than 1%) and were not used within modelling. 
 
-First, Tasting Notes in both the dataset and the conformed table were stemmed using the `SnowballC` package [@SnowballC]. This removed the need to explicitly list both plural and nonplural forms of Tasting Notes (e.g. strawberry, strawberries). Tasting Notes were also matched using ASCII/TRANSLIT so that accented characters were not matched indiscriminately to non-accented characters (e.g. rosé, rose).  
+First, Tasting Notes in both the dataset and the conformed table were stemmed using the `SnowballC` package [@SnowballC]. This removed the need to explicitly list both plural and nonplural forms of Tasting Notes (e.g. strawberry, strawberries). Tasting Notes were also matched using ASCII/TRANSLIT so that accented characters were not matched indiscriminately to non-accented characters (e.g. rosé, rose).
 
 Second, the variable "Ripeness" was extracted from both Variety and Process columns. Ripeness is expressed by colouration (pink, red, yellow, orange, white, black) as a modifier to either column (e.g. pink bourbon). 
 
 Third, Altitude, which was typically expressed in Metres Above Sea Level (MASL), was converted to a numeric value. Values that were presented as a range were averaged (e.g. 2000-2100 = 2050). 
+
 Finally, both Variety and Process columns were parsed in cases where more than one value was presented. This was fairly common for variety, where single-origin farms blend small quantities of other varieties with a primary variety (e.g. caturra + colombia + castillo becomes three columns: Variety1, Variety2, Variety3). It is assumed these values are listed from greatest to least, as occasionally the percentage of each variety is specified, and in these cases the primary variety has always been listed first. These coffees are generally not considered blends when produced by the same farm or producer. Process columns similarly can describe secondary processes performed after main processes (e.g. washed + patio dried becomes two columns: Processing1, Processing2). In these instances, the secondary process describes the drying method, rather than the processing method. In other instances, the secondary process was a synonym for the primary (e.g. natural + dry processed, where by definition natural is a dry processing method). The model used only the primary value for both Variety and Process.
 
 Future models aim to incorporate Regions within Countries using a conformed table to create additional nuance; regional differences are well-noted by Hoffmann (2018). Similarly, in instances where Country was not explicitly listed, but rather presumed by Region, a conformed process could provide missing data (e.g. Huehuetenango would indicate Guatemala).
 
 **Figure \@ref(fig:map)** shows coffee frequency by Country prior to frequency filters required by modelling. Ethiopia and Columbia are the most frequent Countries in the dataset; this is expected with considerations of when the data was collected, as Ethiopia and Columbia both have multiple growing seasons that coincided with the data collection period. A total of 25 Countries were represented in the data, out of the 35 coffee-growing Countries discussed by Hoffmann (2018). Hoffmann speaks to several of these countries having extremely limited production, especially for specialty-grade arabica beans, and thus their ommission is unsurprising (e.g. Vietnam). 
 
-```{r map, fig.align="center", fig.width=5}
+```{r map, out.width="66%", fig.align="center"}
 # mapCountryData(Map, nameColumnToPlot="n", mapTitle = "Coffees from Each Country", catMethod = 'pretty',
 #                   xlim=bbox(xylims)[1,], ylim=bbox(xylims)[2,], colourPalette=colourPalette, missingCountryCol = gray(.8))
 # abline(h=0,lty=2,col='grey')
@@ -171,16 +172,15 @@ mapParams <- mapCountryData(Map,
                    missingCountryCol = gray(.8))
 
 do.call(addMapLegend, c(mapParams,
-                       legendWidth=0.5,
+                       legendWidth=0.75,
                        legendIntervals="data",
                        legendMar=2,
-                       legendShrink =0.5))
+                       legendShrink =0.4))
 abline(h=0,lty=2,col='grey')
 
 ```
 
-In order to produce more reliable accuracy within models, extremely infrequent Processes, Countries, and Varieties were excluded. This threshold was set at 5 individual occurences for each variable. 
-
+In order to produce more reliable accuracy within models, extremely infrequent Processes, Countries, and Varieties were excluded. This threshold was set at 5 individual occurences for each variable. This had a significant effect on the number of Ethiopian coffees included in the model dataset. Ethiopia has a long history of unique Varieties, some of which are endemic to Ethiopia, and the Variety lineage is less established. **Table \@ref(tab:topfreq)** shows the most frequent Countries, Varieties, and Processes following this filtering process.
 
 ```{r topfreq}
 t1 <- pre_prep_data %>% mutate_all(funs(str_to_title(.))) %>% group_by(Variety1) %>% summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6)
@@ -189,28 +189,39 @@ t3 <- pre_prep_data %>% mutate_all(funs(str_to_title(.))) %>% group_by(Processin
 
 kable(list(t2,t1,t3),
       caption="Frequent Varieties, Countries and Proccesses", booktabs = TRUE, linesep= "") %>% 
-  kableExtra::kable_styling(full_width = FALSE, position = "left")
+  kableExtra::kable_styling(full_width = FALSE, position = "left") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
 ```
+
+When Country, Variety, and Process are combined, **Table \@ref(tab:freqcombo)** shows that Columbian Caturra coffees that have been Washed are the most frequent. 4 of the 6 most frequent Countries and Varieties are present in the most frequent combinations of attributes; only 2 distinct Processes are present. 
 
 ```{r freqcombo}
 t4 <- unite(pre_prep_data, ItemSet, Country,Variety1,Processing1, sep = " + ") %>% group_by(ItemSet) %>% 
             summarize(n = n()) %>% arrange(desc(n)) %>% top_n(6) %>% mutate_all(funs(str_to_title(.)))
 kable(t4, caption="Greatest Combination Frequencies", booktabs = TRUE, linesep= "") %>% 
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
-
 ```
+
+Processing has a dramatic effect on Tasting Notes (Hoffmann, 2018), and despite large imbalances in unique Processing frequency, the variable is essential to include within modelling. This effect is observable in the data where a roaster offering two distinct Processes for coffee that is otherwise the same, presents two distinct sets of Tasting Notes (**Table \@ref(tab:twocoffees)** as an example). 
+
+```{r twocoffees}
+kable(data %>% filter(Roaster == 'Pista') %>% filter(Coffeename %like% 'Fugi') %>% mutate_all(funs(str_to_title(.)))  %>% 
+  select(Roaster, Coffeename, Country, Region, Variety, Processing, Tastingnotes), 
+  caption="Different Processed Coffees", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+```
+
+As expressed previously, adding Region to models was desirable. However, combination frequencies (**Table \@ref(tab:freqcomboregion)**) demonstrate the limitations of a dataset this size, where very few regions had more than five frequent occurences when combined with Variety and Process. 
 
 ```{r freqcomboregion}
 t5 <- data %>% distinct() %>% mutate_all(funs(str_to_title(.)))
 
 kable(unite(t5, ItemSet, Country,Region,Variety1,Processing1, sep = " + ") %>% group_by(ItemSet) %>% 
             summarize(n = n()) %>% arrange(desc(n)) %>% top_n(5), 
-      caption="Greatest Combination Frequencies with Region", booktabs = TRUE, linesep= "") %>% 
+      caption="Combination Frequencies with Region > 5", booktabs = TRUE, linesep= "") %>% 
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
-
-For all coffees in the dataset Tasting Groups were stacked so that a single Tasting Group was the predictor. This process is demonstrated as **Table \@ref(tab:premeltsample)** transforms into **Table \@ref(tab:meltsample)**. **Figure \@ref(fig:tastingfrequencyplot)** shows the frequency of all Tasting Groups following this transformation prior to modelling.  
-
+This sparseness in data also affected the model's ability to predict Tasting Notes. Instead, Tasting Groups were determined to be the next best candidate for prediction, having considerably more nuance than Tasting Traits but still frequently occurring for nearly all class labels. As such, for all coffees in the dataset Tasting Groups were stacked so that a single Tasting Group was the predictor. This process is demonstrated as **Table \@ref(tab:premeltsample)** transforms into **Table \@ref(tab:meltsample)**. **Figure \@ref(fig:tastingfrequencyplot)** shows the frequency of all Tasting Groups following this transformation prior to modelling.  
 
 ```{r premeltsample}
 sample4 <- pre_prep_data %>% ungroup() %>% mutate(idx = rownames(pre_prep_data)) %>% filter(idx == 4) %>% mutate_all(funs(str_to_title(.))) %>% 
@@ -230,7 +241,7 @@ kable(sample4melt, caption="Coffee Sample after Stacking", booktabs = TRUE, line
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
 
-```{r tastingfrequencyplot,fig.align="center"}
+```{r tastingfrequencyplot, out.width="66%", fig.align="center"}
 g1 <- prep_data %>% group_by(TastingGroup) %>% summarize(n = n()) %>% arrange(desc(n))
 g1$Prop <- g1$n/sum(g1$n)
 
@@ -241,7 +252,6 @@ ggplot(g1, aes(x=reorder(TastingGroup, n) ,y =n))+
   xlab("Tasting Group") +
   coord_flip() + 
   theme_clean()
-
 ```
 
 
@@ -383,19 +393,39 @@ The Shiny app was deployed using shinyapps.io by RStudio and is available at: ht
 
 ## Discussion
 
+While the results of this study were limited by the size of the dataset that resulted from time constraints, the data scrapers and models developed provide a solid foundation for future research. Evaluating the significance of this work is difficult. Models for certain combinations appear to meet known expectations, and are comparable to previous work by Gagné (varietal + process to predict tasting notes) and Conley and Wilson (country to predict tasting notes). 
 
+Gagné produced Flavor Wheels for five common Varieties (Bourbon, SL28, Heirlooms, Caturra, Geisha) of Washed coffees, and word clouds for 14 Varieties and 11 Processes (five of which were Honey + Ripeness, and two other infrequent but well-known processes - carbonic and anaerobic). Gagné's work did not include prediction, but rather frequency visualizations of 1500 coffees. When comparing these Flavor Wheels to the model, two stand out: Kenya + SL28 + Washed is predominantly Berry Fruit with Other Fruit and Citrus Fruit Tasting Groups; similarly, Ethiopia + Heirloom + Washed is predominantly Floral with Stone Fruit and Citrus Fruit, though Black Tea was not predicted as the dominant Tasting Group. It is difficult to compare beyond SL28 and Heirloom Varieties, which appear almost exclusively in Kenya and Ethiopia, respectively. Varieties that appear throughout the world, such as Bourbon or Caturra, have much more variety in their predictions than Gagné's work, which generalizes Bourbon regardless of Processing or Country of origin.
 
-Conley and Wilson (country to predict tasting notes) and Gagné (varietal + process to predict tasting notes). As examples, Conley and Wilson’s models classified Costa Rican tasting notes as stone fruit (cherry), sugar (sugar cane, brown sugar, syrup, sweet), vanilla; Gagné’s models classified natural + heirloom tasting notes as highly citrus, stone fruit, floral/tea. The combination of these two bodies of work has not yet been established, but basic descriptive statistics are identifiable even within my own coffee journals, where both of the above results are reproducible. 
+Conley and Wilson’s models classified Costa Rican Tasting Notes as Stone Fruit (cherry), Sweet/Brown Sugar (sugar cane, brown sugar, syrup, sweet), and Vanilla. Without knowing either Variety or Process, comparisons with the model for the most commonly occuring Costa Rican coffees were Caturra + Washed, Caturra + Natural, Caturra + Honey, and Catuai + Washed. Of these, all predictions produced Brown Sugar as a Tasting Group, and 3 of 4 produced Stone Fruit. Because Conley and Wilson have used a very small subset of Tasting Notes, placing them within Tasting Groups potentially eliminates the nuance of their analysis, while substituting the complexity of this model. This may suggest that coffees are easier to overgeneralize than specifically predict, but without a greater number of Tasting Notes and more specificity of Variety and Process, it is hard to differentiate the model results from one another.  
+
+Since the combination of these two bodies of work has not yet been established elsewhere, the model provides a rudimentary framework for more multi-class predictions. Comparisons of both Gagné's and Conley and Wilson's work alongside the model and personal coffee journals show that predictive results are reproducible. Thus, despite what appears to be a low overall accuracy rate, model performance is not so prohibitive to suggest that the combination of attributes cannot produce a reliable result.
 
 what you did
 
-findings
-
-learned about the world
+findings - we are seeing consistency, but we only know to look for things we expect
+treemap shows the varieties in these itemsets that is obsevered - drawing huge conclusions is difficult
+learned about the world - without knowing more levels of detail we shouldn't be making any conclusive statements
 
 implications
 
 next steps
+
+```{r}
+library(treemap) #citethis
+
+tree <- unite(prep_data %>% mutate_all(funs(str_to_title(.))) %>% 
+  filter(Country == 'Ethiopia'), ItemSet, Country,Variety1,Processing1, sep = " + ")
+
+treemap(tree %>% group_by(TastingGroup, ItemSet) %>% summarize(n = n()) ,
+        index=c("ItemSet", "TastingGroup"),
+        vSize="n",
+        type="comp",
+        title = "A Title",
+        align.labels = list(c("left", "top"), c("left", "bottom")),
+        overlap.labels	= 1)
+```
+
 
 \newpage
 
