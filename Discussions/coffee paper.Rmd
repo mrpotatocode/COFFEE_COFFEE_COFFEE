@@ -21,7 +21,7 @@ nocite: '@*'
 bibliography: references.bib
 csl: apa-6th-edition.csl
 thanks: 'Code and data are available at: [github.com/mrpotatocode/COFFEE_COFFEE_COFFEE](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE)'
-abstract: Coffee machine learning goes brrrrrrrrrrrrew me another cup
+abstract: In this work, a boosted tree model explores whether combinations of unique coffee attributes can predict the taste of specialty coffees. The properties of 550 coffees, collected over a period of four months, include the coffee's country of origin, variety (subspecies), the means by which it was processed, its harvest characteristic (like altitude and season of harvest), and its tastes generated through consistent cupping practices. These defining attributes are used as predictors for 22 distinct tasing groups and then compared to actual speciality coffees and found to often match two out of every three tasting groups provided by coffee roasters.  
 urlcolor: blue
 always_allow_html: true
 ---
@@ -68,18 +68,18 @@ Coffee is consumed in every country, is the seventh most valuable agricultural p
 
 ### Background
 
-Combining coffee and data science, this exploratory research aims to examine whether a specialty coffee’s Tasting Notes can be predicted by a gradient boosted algorithm based on the coffee's attributes (§Terminology). Several key research studies have explored the relationship between single-origin attributes and their Tasting Notes and thus sit as domain framework for technical applications made here. Exploring Tasting Notes is contingent firstly upon the acceptance of Tasting Notes as objective rather than subjective. This phenomenon has been well-noted by vintners and has likewise been researched with regard to specialty coffee [@Croijmans_Majid_2016]. Research using blind taste and aroma tests generally supports consistency across highly trained panel tasters [@Bhumiratana_Adhikari_Chambers_2011]. The conclusions of Croijmans and Bhumiratana support the contention that Tasting Notes are a combined result of cupping experts’ training and linguistic ability to identify tastes through plain nomenclature. Cupping, following protocols published by the Specialty Coffee Association [@CuppingProtocols], serves as the only means for Tasting Note generation across all relevant studies. Standardized cupping routines were thoroughly explored as a case study in Rwanda [@Goldstein_2011] and found to be reliable.
+Combining coffee and data science, this exploratory research aims to examine whether a specialty coffee’s Tasting Notes can be predicted by a gradient boosted algorithm based on the coffee's attributes (§Terminology). Several key research studies have explored the relationship between single-origin attributes and their Tasting Notes and thus sit as domain framework for technical applications made here. Exploring Tasting Notes is contingent firstly upon the acceptance of Tasting Notes as objective rather than subjective. This phenomenon has been well-noted by vintners and has likewise been researched with regard to specialty coffee [@Croijmans_Majid_2016]. Research using blind taste and aroma tests generally supports consistency across highly trained panel tasters [@Bhumiratana_Adhikari_Chambers_2011]. The conclusions of Croijmans and Bhumiratana support the contention that Tasting Notes are a combined result of cupping experts’ training and linguistic ability to identify tastes through plain nomenclature. Cupping, following protocols published by the Specialty Coffee Association (2003), serves as the only means for Tasting Note generation across all relevant studies. Standardized cupping routines were thoroughly explored as a case study in Rwanda [@Goldstein_2011] and found to be reliable.
 
 As such, this project is firmly rooted in scientific consensus that tasting notes are consistent in their generation and thus measurable by machine learning models. From this assertion, two previous experiments have explored single-origin coffee Tasting Notes. Firstly, _Coffee Terroir: Cupping Description Profiles and Their Impact Upon Prices in Central American Coffees_ [@Conley_Wilson_2018] combined country of origin and Tasting Notes within a Multiclass Classification Neural Network and examined the attribute coefficients via regression analysis. Secondly, research produced in a blogging side project by Jonathan Gagné (2019) at the University of Montreal exemplifies Varietal:Tasting Note and Processing:Tasting Note relationships.
 
-This work aims to reinforce the anecdotal assumption that curation of specialty coffees creates certain tastes. The industry cultivates (even without intention) a collection of expected Tasting Notes for known attribute combinations that are perceived as desirable by consumers, thus reinforcing the industry’s expectations and further cultivation of Tasting Notes. The results of modelling, as well as its implications are important within the coffee industry; if known attribute combinations directly contribute to desirable Tasting Notes, producers may know the value of a crop before buying and roasting. This has noted implication on price, as well-studied by Traore et al. (2018), and exemplified in Pacamara and Caturra varieties.
+This work aims to reinforce the anecdotal assumption that curation of specialty coffees creates certain tastes. The industry cultivates (even without intention) a collection of expected Tasting Notes for known attribute combinations that are perceived as desirable by consumers, thus reinforcing the industry’s expectations and further cultivation of Tasting Notes. The results of modelling, as well as its implications are important within the coffee industry; if known attribute combinations directly contribute to desirable Tasting Notes, producers may know the value of a crop before buying and roasting. This has noted implication on price; Traore et al. (2018) highlighted the phenomenon for Pacamara and Caturra varieties.
 
 
 ### Terminology	
 
-As the world’s appetite for coffee has grown, the coffee industry's "Third Wave" movement has flourished. The movement aims to treat coffee as an artisanal product that is carefully curated, where coffee quality is maximized at each stage: farming, producing, roasting, and selling (Rosenberg et al., 2018). There is an “obsession” with coffee’s taste and an often-altruistic approach to conducting business (Pendergrast, 2010). At its pinnacle, single-origin specialty coffee exists beyond a means to caffeinate and instead engages an increasingly discerning consumer.
+As the world’s appetite for coffee has grown, the coffee industry's "Third Wave" movement has flourished. The movement aims to treat coffee as an artisanal product that is carefully curated, where coffee quality is maximized at each stage: farming, producing, roasting, and selling [@Rosenberg_Swilling_Vermeulen_2018]. There is an “obsession” with coffee’s taste and an often-altruistic approach to conducting business [@Pendergrast_2010]. At its pinnacle, single-origin specialty coffee exists beyond a means to caffeinate and instead engages an increasingly discerning consumer.
 
-Under the umbrella term, "Third Wave", coffees within this project are those that have been produced at a "single origin:" coffee that is sourced from a single producer, farm, or crop. These coffees are further graded as "specialty coffee": coffee of the species Coffea arabica that is within the top 20% of graded coffee produced worldwide. Two grading systems are generally utilized: Q-grading, as defined by the Specialty Coffee Association, and sieve grading, where larger beans are generally preferred (with the exception of single-seed “peaberry” coffees). Different countries utilize different grades (e.g. ‘AA,’ 16+, ‘Strictly High Grown,’ ‘Extra Fancy’) but top grades are well distinguished from middle- and commodity-grade coffees. 
+Under the umbrella term, "Third Wave", coffees within this project are those that have been produced at a "single origin:" coffee that is sourced from a single producer, farm, or crop. These coffees are further graded as "specialty coffee": coffee of the species Coffea arabica that is within the top 20% of graded coffee produced worldwide. Two grading systems are generally utilized: Q-grading, as defined by the Specialty Coffee Association, and sieve grading, where larger beans are generally preferred (with the exception of single-seed “peaberry” coffees). Different countries utilize different grades (e.g. ‘AA,’ 16+, ‘Strictly High Grown,’ ‘Extra Fancy’) but top grades are well distinguished from middle- and commodity-grade coffees [@Hoffmann_2018]. 
 
 Single-origin coffees are intended to be traceable, meaning consumers are privy to the production cycle before purchase. This data is represented by a core of common attributes: 1) Country and region of production; 2) Variety; 3) Harvest characteristics; 4) Processing; 5) Taste; and 6) Roast. Full descriptions of these attributes and their definitions can be found in Appendix A.
 
@@ -151,7 +151,7 @@ Second, the variable "Ripeness" was extracted from both Variety and Process colu
 
 Third, Altitude, which was typically expressed in Metres Above Sea Level (MASL), was converted to a numeric value. Values that were presented as a range were averaged (e.g. 2000-2100 = 2050). 
 
-Finally, both Variety and Process columns were parsed in cases where more than one value was presented. This was fairly common for variety, where single-origin farms blend small quantities of other varieties with a primary variety (e.g. caturra + colombia + castillo becomes three columns: Variety1, Variety2, Variety3). It is assumed these values are listed from greatest to least, as occasionally the percentage of each variety is specified, and in these cases the primary variety has always been listed first. These coffees are generally not considered blends when produced by the same farm or producer. Process columns similarly can describe secondary processes performed after main processes (e.g. washed + patio dried becomes two columns: Processing1, Processing2). In these instances, the secondary process describes the drying method, rather than the processing method. In other instances, the secondary process was a synonym for the primary (e.g. natural + dry processed, where by definition natural is a dry processing method). The model used only the primary value for both Variety and Process.
+Finally, both Variety and Process columns were parsed in cases where more than one value was presented. This was fairly common for variety, where single-origin farms blend small quantities of other varieties with a primary variety (e.g. caturra + colombia + castillo becomes three columns: Variety1, Variety2, Variety3). It is assumed these values are listed from greatest to least, as occasionally the percentage of each variety is specified, and in these cases the primary variety has always been listed first. These coffees are generally not considered blends when produced by the same farm or producer. Process columns similarly can describe secondary processes performed after main processes (e.g. washed + patio dried becomes two columns: Processing1, Processing2). In these instances, the secondary process describes the drying method, rather than the processing method. In other instances, the secondary process was a synonym for the primary (e.g. natural + dry processed, where, by definition, natural is a dry processing method). The model used only the primary value for both Variety and Process.
 
 Future models aim to incorporate Regions within Countries using a conformed table to create additional nuance; regional differences are well-noted by Hoffmann (2018). Similarly, in instances where Country was not explicitly listed, but rather presumed by Region, a conformed process could provide missing data (e.g. Huehuetenango would indicate Guatemala).
 
@@ -193,7 +193,7 @@ kable(list(topfreq_cont,topfreq_var,topfreq_proc),
   kableExtra::kable_styling(latex_options = "HOLD_position")
 ```
 
-When Country, Variety, and Process are combined, **Table \@ref(tab:freqcombo)** shows that Columbian Caturra coffees that have been Washed are the most frequent. 4 of the 6 most frequent Countries and Varieties are present in the most frequent combinations of attributes; only 2 distinct Processes are present. 
+When Country, Variety, and Process are combined, **Table \@ref(tab:freqcombo)** shows that Columbia + Caturra + Washed coffees are the most frequent. 4 of the 6 most frequent Countries and Varieties are present in the most frequent combinations of attributes; only 2 distinct Processes are present. 
 
 ```{r freqcombo}
 freqcombo <- unite(pre_prep_data, ItemSet, Country,Variety1,Processing1, sep = " + ") %>% group_by(ItemSet) %>% 
@@ -202,7 +202,7 @@ kable(freqcombo, caption="Greatest Combination Frequencies", booktabs = TRUE, li
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
 
-Processing has a dramatic effect on Tasting Notes (Hoffmann, 2018), and despite large imbalances in unique Processing frequency, the variable is essential to include within modelling. This effect is observable in the data where a roaster offering two distinct Processes for coffee that is otherwise the same, presents two distinct sets of Tasting Notes (**Table \@ref(tab:twocoffees)** as an example). 
+Processing has a dramatic effect on Tasting Notes [@Hoffmann_2018], and despite large imbalances in unique Processing frequency, the variable is essential to include within modelling. This effect is observable in the data where a roaster offering two distinct Processes for coffee that is otherwise the same, presents two distinct sets of Tasting Notes (**Table \@ref(tab:twocoffees)** as an example). 
 
 ```{r twocoffees}
 PistaFugi <- data %>% filter(Roaster == 'Pista') %>% filter(Coffeename %like% 'Fugi') %>% 
@@ -222,6 +222,7 @@ kable(unite(freqcomboregion, ItemSet, Country,Region,Variety1,Processing1, sep =
       caption="Combination Frequencies with Region > 5", booktabs = TRUE, linesep= "") %>% 
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
+
 This sparseness in data also affected the model's ability to predict Tasting Notes. Instead, Tasting Groups were determined to be the next best candidate for prediction, having considerably more nuance than Tasting Traits but still frequently occurring for nearly all class labels. As such, for all coffees in the dataset Tasting Groups were stacked so that a single Tasting Group was the predictor. This process is demonstrated as **Table \@ref(tab:premeltsample)** transforms into **Table \@ref(tab:meltsample)**.  
 
 ```{r premeltsample}
@@ -243,7 +244,7 @@ kable(sample4melt, caption="Coffee Sample after Stacking", booktabs = TRUE, line
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
 
-**Figure \@ref(fig:tastingfrequencyplot)** shows the frequency of all Tasting Groups following this transformation prior to modelling. Seven Tasting Groups, Other Fruit, Brown Sugar, Stone Fruit, Berry Fruit, Cocoa, and Floral, are much more prominant Tasting Groups than other Tasting Groups. This imbalance has strong influence on the model (§Results), as very few coffees are predicted with Tasting Groups aside from these seven. However, some Tasting Notes are considerably rare for coffees as a whole, but highly frequent for specific coffee attribute combinations, such as Black Tea, an often curated Tasting Note for Ethiopian coffees (Hoffmann, 2018). As such, the lack of presence within the overall dataset does not indicate that the Tasting Note will not be predicted.
+**Figure \@ref(fig:tastingfrequencyplot)** shows the frequency of all Tasting Groups following this transformation prior to modelling. Seven Tasting Groups, Other Fruit, Brown Sugar, Stone Fruit, Berry Fruit, Cocoa, and Floral, are much more prominent Tasting Groups than other Tasting Groups. This imbalance has strong influence on the model (§Results), as very few coffees are predicted with Tasting Groups aside from these seven. However, some Tasting Notes are considerably rare for coffees as a whole, but highly frequent for specific coffee attribute combinations, such as Black Tea, an often-curated Tasting Note for Ethiopian coffees [@Hoffmann_2018]. As such, the lack of presence within the overall dataset does not indicate that the Tasting Note will not be predicted.
 
 ```{r tastingfrequencyplot, out.width="66%", fig.align="center", fig.cap="Tasting Group Frequency Prior to Modelling"}
 g1 <- prep_data %>% group_by(TastingGroup) %>% summarize(n = n()) %>% arrange(desc(n))
@@ -260,21 +261,56 @@ ggplot(g1, aes(x=reorder(TastingGroup, n) ,y =n))+
 
 ## Model
 
-Using `tidymodels` [@tidymodels], a workflow for a Gradient Boosted Tree model with an `XGBoost` [@xgboost] engine predicted Tasting Groups using Country, first Varietal, and first Process for all coffees. The dataset was split into training and testing sets using a 75/25 non-stratified split. All predictor values were converted to dummy values (as they were all nominal). The Boosted Tree was tuned using grid search hyperparameterization on the number of trees (trees), the splitting criteria for each node (min_n), the maxiumum depth of trees (tree_depth), and the learning rate between iterations (learn_rate). 256 total parameter combinations were run (four parameters with four selections each, 4^4). During grid search, 10-fold cross validaton was performed. The model was then evaluated on the testing dataset before the best parameter set was selected based on the highest ROC accuracy under curve value. The finalized model was then fit to the entire dataset.
+Using `tidymodels` [@tidymodels], a workflow for a Gradient Boosted Tree model with an `XGBoost` [@xgboost] engine predicted Tasting Groups using Country, first Varietal, and first Process for all coffees (Predictors: _Variety1_, _Processing1_, _Country._ Outcome: _TastingGroup_). The dataset was split into training and testing sets using a 75/25 non-stratified split. All predictor values were converted to dummy values (as they were all nominal). The Gradient Boosted Tree was tuned using grid search hyperparameterization on the number of trees (trees), the splitting criteria for each node (min_n), the maxiumum depth of trees (tree_depth), and the learning rate between iterations (learn_rate). 256 total parameter combinations were run (four parameters with four selections each, 4^4). During grid search, 10-fold cross validation was performed. The model was then evaluated on the testing dataset before the best parameter set was selected based on the highest ROC accuracy under curve value. The finalized model was then fit to the entire dataset.
 
-XGBoost (Chen and Guestrin, 2016) [@xgboostpaper], uses the same principals as other Gradient Boosted Trees; 
+XGBoost [@xgboostpaper], uses the same principals as other Gradient Boosted Trees: loss minimization through gradient descent. XGBoost balances the need to explore all base learners (training loss) and the performance requirements of calculating a loss function for each point of gradient descent (regularization). This is achieved by calculating a residual similarity scores after each leaf splitting criteria is evaluated. The node with the greatest information gain (maximum loss reduction) is selected greedily (so not all trees or learning rates are explored). As an ensemble model, each term is added to the previous to adjust error rates created by previous model iterations.
 
+The final prediction, achieved by fitting base learners to the minimum loss by gradient descent is as follows:
+$$\hat{y_i} = \sum_{k=1}^TK_{k}(x_{i})$$
 
-$$\hat{y_i} = \sum_{t=i}^mf_{t}(x_{i})$$
+* $\hat{y_i}$ is predicted value
+* $K$ is the number of K additive functions used to predict the output
+* $f_{k}$ is the space of trees (structure: depth, leaf weight)
+* $x_{i}$ is the set of attributes defining the tree (the dataset)
 
-XGBoost calculates residual similarity scores after each leaf splitting criteria is evaluated. The node with the greatest information gain (maximum loss reduction) is selected greedily, where not all combinations are explored. 
+Trees are defined by their splitting criteria (leaf weight), structure (tree depth), such that:
+$$f_{t}(x_{i}) = w_{q(x)}$$
 
+* $w$ is the leaf weight
+* $q(x)$ is the tree structure
 
-$$\Lambda^{(t)} = \sum_{i}\lambda(y_i,\hat{y_i}^{(t-1)} + f_{t}(x_i)) + \Omega(f_{t})$$
+XGBoost seeks to minimize its regularized function:
+$$L(\phi) = \sum_{i}l(\hat{y_i},y_i) + \sum_{k}\Omega(f_{k})$$
 
-$\Lambda ( \phi )$
+* $l(\hat{y_i},y_i)$ is the difference between prediction and actual
 
+for a loss coefficient (learning rate) as:
+$$\Omega(f_t) = \gamma T + \frac12\lambda \sum_{j = 1}^T w_j ^2$$
 
+* $\Omega(f_t)$ is the loss coefficient applied to the the tree
+* $\gamma T$ is the number of leaves for the tree
+* $\frac12\lambda \sum_{j = 1}^T w_j ^2$ is the Euclidean norm for leaf scores
+
+The ensemble method then is calculated through boosting:
+
+* $\hat{y_i}^{(0)}$ = 0
+* $\hat{y_i}^{(1)}$ = $\hat{y_i}^{(0)} + f_{1}(x_{i})$
+* $\hat{y_i}^{(2)}$ = $\hat{y_i}^{(1)} + f_{2}(x_{i})$
+
+Until a finalized term is added to the model 
+$$\hat{y}^{(t)} = \sum_{i=1}\lambda(y_i,\hat{y_i}^{(t-1)} + f_{t}(x_i)) + \Omega(f_{t})$$
+
+* $\hat{y}^{(t)}$ is the model at training
+* $\sum_{i=1}\lambda(y_i,\hat{y_i}^{(t-1)} + f_{t}(x_i))$ adds each boosting function, including the functions add in previous iteration ($\hat{y_i}^{(t-1)}$)
+* $f_{t}(x_i)$ as the new function
+* $\Omega(f_{t})$ the loss coefficient as previous calculated
+
+As such, **Table \@ref(tab:bestparams)** shows the best selected parameters for the model following hyperparametization through grid search.
+
+```{r bestparams} 
+kable(boosted_param %>% select(-'.config'), caption="XGBoost Model Parameters", booktabs = TRUE, linesep= "") %>% 
+  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+```
 
 ## Results
 
@@ -297,9 +333,9 @@ A confusion matrix (**Figure \@ref(fig:confmat)**) run on the conserved test dat
 
 ![(#fig:confmat) Confusion Matrix](./imgs/confusion_matrix.png){width=70%}
 
-However, both **Table \@ref(tab:tgroupaccu)** and the confusion matrix are poor representations of the model's performance, and the accuracy score for the model cannot be conventionally calculated. Instead, a better accuracy metric must measure the three most probable predictions while simultaneously deemphasizing the order in which Tasting Groups appear. These needs are specific to coffee: Tasting Group order is irrelevent because there is neither standardization (e.g. fruits are listed before sugars) nor hierarchy (i.e. the first note is not more prevalent than the second). Therefore, the most probable prediction does not need to coincide with the first of three Tasting Groups.
+However, both **Table \@ref(tab:tgroupaccu)** and the confusion matrix are poor representations of the model's performance, and the accuracy score for the model cannot be conventionally calculated. Instead, a better accuracy metric must measure the three most probable predictions while simultaneously deemphasizing the order in which Tasting Groups appear. These needs are specific to coffee: Tasting Group order is irrelevant because there is neither standardization (e.g. fruits are listed before sugars) nor hierarchy (i.e. the first note is not more prevalent than the second). Therefore, the most probable prediction does not need to coincide with the first of three Tasting Groups.
 
-All possible unique inputs were provided to the model and the top three most probable predictions were tabulated alongside their actual (truth) values. A Boolean flag checked whether the first predicted value was in any of the three Tasting Groups. This process was repeated for the second and third predicted values. This method also correctly predicts Tasting Groups for coffees that do not have three unique Tasting Groups. Tasting Groups do not need to be unique because they represent the Tasting Notes which are unique (e.g. Black Currant and Raspberry are both Berry Fruits, therefore both the first and second Tasting Group would be Berry Fruit). Because the model cannot predict the same Tasting Group twice, the Boolean flag allowed duplicate Tasting Groups found within a given coffee to be counted for each occurence of a Tasting Group, as if the model had predicted duplicate values. An example coffee (**Table \@ref(tab:sampleaccu)**) demonstrates the recalculated accuracy metric. For a coffee with given Country + Variety + Process attributes: "Rwanda + Bourbon + Honey", predictions were Brown Sugar, Other Fruit, and Stone Fruit. Actual values were Brown Sugar, Other Fruit, and Other Fruit. Because the model has predicted both Brown Sugar and Other Fruit, the accuracy is 100% for the given set of coffee attributes. 
+All possible unique inputs were provided to the model and the top three most probable predictions were tabulated alongside their actual (truth) values. A Boolean flag checked whether the first predicted value was in any of the three Tasting Groups. This process was repeated for the second and third predicted values. This method also correctly predicts Tasting Groups for coffees that do not have three unique Tasting Groups. Tasting Groups do not need to be unique because they represent the Tasting Notes which are unique (e.g. Black Currant and Raspberry are both Berry Fruits, therefore both the first and second Tasting Group would be Berry Fruit). Because the model cannot predict the same Tasting Group twice, the Boolean flag allowed duplicate Tasting Groups found within a given coffee to be counted for each occurrence of a Tasting Group, as if the model had predicted duplicate values. An example coffee (**Table \@ref(tab:sampleaccu)**) demonstrates the recalculated accuracy metric. For a coffee with given Country + Variety + Process attributes: "Rwanda + Bourbon + Honey", predictions were Brown Sugar, Other Fruit, and Stone Fruit. Actual values were Brown Sugar, Other Fruit, and Other Fruit. Because the model has predicted both Brown Sugar and Other Fruit, the accuracy is 100% for the given set of coffee attributes. 
 
 ```{r sampleaccu}
 sample_accu <- final_accuracy %>% select(-id) %>% 
@@ -307,23 +343,27 @@ sample_accu <- final_accuracy %>% select(-id) %>%
   select(-Variety1,-Processing1,-Country)
 
 sample_accu <- sample_accu %>% select(-idx) %>% rename("Prediction" = note, "Probability" = value,
-                    'Actual1' = Group1,  'Actual2' = Group2, 'Actual3' = Group3, 
-                    'Correct1' = Group1_c, 'Correct2' = Group2_c, 'Correct3' = Group3_c) %>% 
+                    'TG_Actual1' = Group1,  'TG_Actual2' = Group2, 'TG_Actual3' = Group3, 
+                    'TG_Correct1' = Group1_c, 'TG_Correct2' = Group2_c, 'TG_Correct3' = Group3_c) %>% 
   mutate(across(is.numeric, ~ round(., 3)))
 
 kable(sample_accu, caption="Rwanda + Bourbon + Honey Accuracy Measurement", booktabs = TRUE, linesep= "") %>% 
-  kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
+  kableExtra::kable_styling(latex_options = c("stripped", "scale_down", "HOLD_position"))
 ```
 
 Thus, the total number of true predictions were 534 of 1188 for a model accuracy score of 44.949% (**Table \@ref(tab:accu)**). 
 
 ```{r accu}
 #model accuracy:
-accu <- (correct_predictions %>% filter(Var1 == TRUE) 
-         %>% summarize(freq = sum(Freq)))/nrow(final_accuracy)
+accu <- correct_predictions %>% filter(Var1 == TRUE, Var2 %like% '_c') %>% select(-Var1) %>% transpose(make.names	='Var2')
 
-kable(sprintf("%0.3f%%", accu * 100),  col.names = "Accuracy", 
-      caption="Actual Model Accuracy", booktabs = TRUE, linesep= "") %>% 
+accu$Correct <- as.numeric(correct_predictions %>% filter(Var1 == TRUE) %>% summarize(freq = sum(Freq)))
+accu$Total <- nrow(final_accuracy)
+accu$Accuracy <- as.numeric(accu$Correct/accu$Total)
+
+kable(accu %>% mutate(Accuracy = sprintf("%0.3f%%", accu$Accuracy * 100)),  
+      col.names = c('TG_Correct1','TG_Correct2','TG_Correct3','TotalCorrect','TotalTastingGroups','Accuracy'), 
+      caption="Adjusted Model Accuracy", booktabs = TRUE, linesep= "") %>% 
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 
 ```
@@ -346,7 +386,7 @@ Gagné produced Flavor Wheels for five common Varieties (Bourbon, SL28, Heirloom
 
 Conley and Wilson’s models classified Costa Rican Tasting Notes as Stone Fruit (cherry), Sweet/Brown Sugar (sugar cane, brown sugar, syrup, sweet), and Vanilla. Without knowing either Variety or Process, comparisons with the model for the most commonly occurring Costa Rican coffees were Caturra + Washed, Caturra + Natural, Caturra + Honey, and Catuai + Washed. Of these, all predictions produced Brown Sugar as a Tasting Group, and 3 of 4 produced Stone Fruit. Because Conley and Wilson have used a very small subset of Tasting Notes, placing them within Tasting Groups potentially eliminates the nuance of their analysis, while substituting the complexity of this model. This may suggest that coffees are easier to overgeneralize than specifically predict, but without a greater number of Tasting Notes and more specificity of Variety and Process, it is hard to differentiate the model results from one another.  
 
-Since the combination of these two bodies of work has not yet been established elsewhere, the model provides a rudimentary framework for more multi-class predictions. Comparisons of both Gagné's and Conley and Wilson's work alongside the model and personal coffee journals show that predictive results are reproducible. Thus, despite what appears to be a low overall accuracy rate, model performance is not so prohibitive to suggest that the combination of attributes cannot produce a reliable result.
+Since the combination of these two bodies of work has not yet been established elsewhere, the model provides a rudimentary framework for more multi-class predictions. Comparisons of both Gagné's (2019) and Conley and Wilson's (2018) work alongside the model and personal coffee journals show that predictive results are reproducible. Thus, despite what appears to be a low overall accuracy rate, model performance is not so prohibitive to suggest that the combination of attributes cannot produce a reliable result.
 
 ### Findings and Implications
 
@@ -356,7 +396,7 @@ Two coffees within **Figure \@ref(fig:treemap)** describe a simplified version o
 
 This can be contrasted to Costa Rica + Catuai + Honey, where Other Fruit, Brown Sugar, and Stone Fruit (the model predictions) represent the majority of occurring Tasting Groups (only Dried Fruit is highly frequent). Conclusions made based on the model's outcomes for this attribute set will be better as the coffee's show demonstrate less Tasting Group diversity. 
 
-```{r treemap, out.width="80%", fig.align="center", fig.cap="Treemap of Costa Rican Coffee's Tasting Groups as they Appear within the Dataset"}
+```{r treemap, out.height="80%", fig.align="center", fig.cap="Treemap of Costa Rican Coffee's Tasting Groups as they Appear within the Dataset"}
 treemap(tree %>% group_by(TastingGroup, ItemSet) %>% summarize(n = n()) ,
         index=c("ItemSet", "TastingGroup"),
         vSize="n",
@@ -367,23 +407,23 @@ treemap(tree %>% group_by(TastingGroup, ItemSet) %>% summarize(n = n()) ,
         position.legend	= 'none')
 ```
 
-This effect is problematic. When examining the model, several well-known Tasting Group combinations for coffee attribute sets appeared to be correct (e.g, Kenya + SL28 + Washed). However, it is difficult to say whether this demonstrates consistency or confirmation bias. For lesser-known, more interesting coffee combinations, or highly varying coffee (such as Costa Rica + Catuai + Washed in **Figure \@ref(fig:treemap)**), there is insufficent knowledge (and data) to evaulate predicted values. 
+This effect is problematic. When examining the model, several well-known Tasting Group combinations for coffee attribute sets appeared to be correct (e.g, Kenya + SL28 + Washed). However, it is difficult to say whether this demonstrates consistency or confirmation bias. For lesser-known, more interesting coffee combinations, or highly varying coffee (such as Costa Rica + Catuai + Washed in **Figure \@ref(fig:treemap)**), there is insufficient knowledge (and data) to evaluate predicted values. 
 
 Broader implications, such as using this model within a commercial environment, or using it to inform farming decisions should be avoided at this time. Accurately describing a coffee's taste alongside its attributes can logically be applied to a recommender algorithm when costumer preferences are known and collected. This dataset is not suitable for this application. In general, if conclusions are to be made at all, they should be made cautiously, with considerable domain knowledge, and with awareness that the model requires a much larger dataset (§Next Steps). 
 
-There is however, some novelty in the models creation and with some optimisim, begins to unravel some of the complications of specialty coffees. The model should not stifle creativity, but instead reaffirm the anecdotes of well-trained coffee tasters, and can serve as evidence when describing coffee complexities to sceptical audiences. 
+There is, however, some novelty in the models creation and with some optimism, begins to unravel some of the complications of specialty coffees. Conley and Wilson highlight the important of accurate models as, "enabl[ing] the development of formal appellations to confirm each country’s unique coffee profile." (2018) The model should not stifle creativity, but instead reaffirm the anecdotes of well-trained coffee tasters, and can serve as evidence when describing coffee complexities to sceptical audiences. 
 
 ### Next Steps
 
-As mentioned previously,continued data collection is paramount to further develop this model. Additional sources of weekly data, should be produced much in the same way of the original coffee scrapers. One-off entire site scraping is not required, though if suitable and easy to scrape sites are identified, the model will improve from greater coffee data depth. Weekly scrapers generally focused on a single roaster, though this was not necessarily intentional. Using a small collection of single roasters intended to control the quality of coffee, but as specialty coffee has become much more commonplace, new data sources for the same coffees can be identified. A partnership with a group of roasters who could reliably provide data, rather than scraping should be another avenue worth considering. Regardless of source, data richness should be of utmost importance. As discussed, Region is the next-most-logical variable to be added to the model. Altitude should follow shortly after, but correlation between variables should be considered. 
+As mentioned previously, continued data collection is paramount to further develop this model. Additional sources of weekly data should be produced much in the same way of the original coffee scrapers. One-off entire site scraping is not required, though if suitable and easy to scrape sites are identified, the model will improve from greater coffee data depth. Weekly scrapers generally focused on a single roaster, though this was not necessarily intentional. Using a small collection of single roasters intended to control the quality of coffee, but as specialty coffee has become much more commonplace, new data sources for the same coffees can be identified. A partnership with a group of roasters who could reliably provide data, rather than scraping should be another avenue worth considering. Regardless of source, data richness should be of utmost importance. As discussed, Region is the next-most-logical variable to be added to the model. Altitude should follow shortly after, but correlation between variables should be considered. 
 
-Region also allows the introduction of conformed GIS data describing a coffee's terroir. Though regional climates are likely generalizable for all coffee growing region, small changes may vastly improve Tasting Group or Tasting Note prediction. Should some coffee roasters begin to regularly provide latitide and longitude pairs for farm locations terroir details can aid in searching for patterns amongst extreme specificity. 
+Region also allows the introduction of conformed GIS data describing a coffee's terroir. Though regional climates are likely generalizable for all coffee growing region, small changes may vastly improve Tasting Group or Tasting Note prediction. Should some coffee roasters begin to regularly provide latitude and longitude pairs for farm locations terroir details can aid in searching for patterns amongst extreme specificity. 
 
-In addition to capturing an entire year's coffee production, the dataset should be considered nascent until at least 2000 coffees have been collected. This strikes a balance between sparsity and zero variance, allowing for the boost trees model to explore relationships between some of these variables. This quantity will also allow for other well-recognized Varieties and Processes to become prevalent within the dataset (e.g. Batian and SL-34, Anaerobic and Carbonic). Some filtering to reduce extremely experimental Varieties or Processes will still be required. It may also prove interesting to model coffees beyond their first Variety, especially for frequently occurring itemsets. For example, SL34 is often paired with SL28 in Kenyan Washed coffees. Understanding how slight modifiers, like Ripeness or a second Variety alter Tasting Groups/Notes could help to deleninate coffees that are currently over-generalized. 
+In addition to capturing an entire year's coffee production, the dataset should be considered nascent until at least 2000 coffees have been collected. This strikes a balance between sparsity and zero variance, allowing for the boost trees model to explore relationships between some of these variables. This quantity will also allow for other well-recognized Varieties and Processes to become prevalent within the dataset (e.g. Batian and SL-34, Anaerobic and Carbonic). Some filtering to reduce extremely experimental Varieties or Processes will still be required. It may also prove interesting to model coffees beyond their first Variety, especially for frequently occurring itemsets. For example, SL34 is often paired with SL28 in Kenyan Washed coffees. Understanding how slight modifiers, like Ripeness or a second Variety alter Tasting Groups/Notes could help to delineate coffees that are currently over-generalized. 
 
-All data collection efforts should achieve the original objective of this study was at its conception: predict Tasting _Notes_ rather than Tasting Groups. Tasting Groups, while essential for the success of this project, are still too reductive. Specialty coffees are interesting because of their nuance: a coffee tasting of apple is quite different than a coffee tasting of banana, yet both of these are categorized by Other Fruit. For the model to be used in any utiliaritian purposes, this nuance must be presevered.
+All data collection efforts should achieve the original objective of this study was at its conception: predict Tasting _Notes_ rather than Tasting Groups. Tasting Groups, while essential for the success of this project, are still too reductive. Specialty coffees are interesting because of their nuance: a coffee tasting of apple is quite different than a coffee tasting of banana, yet both of these are categorized by Other Fruit. For the model to be used in any utilitarian purposes, this nuance must be persevered.
 
-In order to help models predict Tasting Notes, it will like prove prudent to add a fourth layer the SCA Tasting Wheel to reduce the overall complexity of Tasting Notes. Some Tasting Notes are overly specific: for example, Bosc Pear, White Pear, Baked Pear, Bartlett Pear, Yellow Pear, Asian Pear, and Pear Tart all describe Pear. This has two effects: firstly, helping the model make nuanced predictions within slightly broader categories; secondly, the increased granularity will provide a clearer sense of how model predictions for coffees with the same Tasting Group should be evaluated (such as the example coffee in **Table \@ref(tab:sampleaccu)**).
+In order to help models predict Tasting Notes, it will likely prove prudent to add a fourth layer the SCA Tasting Wheel to reduce the overall complexity of Tasting Notes. Some Tasting Notes are overly specific: for example, Bosc Pear, White Pear, Baked Pear, Bartlett Pear, Yellow Pear, Asian Pear, and Pear Tart all describe Pear. This has two effects: firstly, helping the model make nuanced predictions within slightly broader categories; secondly, the increased granularity will provide a clearer sense of how model predictions for coffees with the same Tasting Group should be evaluated (such as the example coffee in **Table \@ref(tab:sampleaccu)**).
 
 With these steps taken, it may become possible to examine whether a specialty coffee’s Tasting Notes can be predicted with both nuance and precision based on the coffee's attributes. The possible applications from this work can benefit producers and farmers by shifting purchases from a one-time transaction to a longer-term investment at each stage of the coffee lifecycle, to academics exploring coffee composition at the molecular level. And of course, predictable coffee can benefit consumers, who, with a data-rich cup of coffee promote a seed-to-cup approach and have begun to propose the next wave of coffee: _ethical consumption_.
 
@@ -399,24 +439,20 @@ With these steps taken, it may become possible to examine whether a specialty co
 
 1) Country and region of production, where the coffee was cultivated. 
 
-2) Variety, the subspecies cultivated through selection (e.g. typica, bourbon, cattura, SL-28, geisha, heirloom). Variety may also be referred to as varietal, a single instance of a variety, for example within a crop or a farm, rather than the subspecies. There are an unknown number of varieties in the world; however, there are a handful of popular, well-identified varieties whose morphologies are well-documented.
+2) Variety, the subspecies cultivated through selection (e.g. Typica, Bourbon, Caturra, SL28, Geisha, Heirloom). Variety may also be referred to as varietal, a single instance of a variety, for example within a crop or a farm, rather than the subspecies. There are an unknown number of varieties in the world; however, there are a handful of popular, well-identified varieties whose morphologies are well-documented.
 
-3) Harvest characteristics, including the following: ripeness colouration (e.g. black, red, orange, yellow, white—from most to least ripened), farm’s location (latitude and longitude) and terroir (i.e. temperature, rainfall, soil composition, days of sunshine, meters above sea level [MASL]), season of harvest, and picking methods (e.g. hand, stripping, mechanical). Farmers (sometimes called estate owners) control these factors.
+3) Harvest characteristics, including the following: Ripeness colouration (e.g. black, red, orange, yellow, white—from most to least ripened), farm’s location (latitude and longitude) and terroir (i.e. temperature, rainfall, soil composition, days of sunshine, Elevation [MASL]), season of harvest, and picking methods (e.g. hand, stripping, mechanical). Farmers (sometimes called estate owners) control these factors.
 
-4) Processing (dry, wet, honey, pulp) and drying (patio, raised, mechanical) methods. Farmers or producers determine these factors, depending on available infrastructure. In the case where farmers are not able to process and dry their crop, producers (often within co-ops) handle the processing of beans and are thus sometimes considered the “origin” when multiple lots are collected and processed simultaneously.
+4) Processing (Natural, Washed, Honey, Pulped) and drying (patio, raised, mechanical) methods. Farmers or producers determine these factors, depending on available infrastructure. In the case where farmers are not able to process and dry their crop, producers (often within co-ops) handle the processing of beans and are thus sometimes considered the “origin” when multiple lots are collected and processed simultaneously.
 
-5) Roast, where all beans have been roasted (i.e. have undergone the Maillard Reaction). Roasters determine duration and temperature. Roasters are occasionally referred to as producers, especially within relationship-coffee purchases. For the sake of simplicity and with due consideration of the effect of roast, the scope of this project will not consider coffee roasted beyond the “first crack.”
+5) Roast, where all beans have been roasted (i.e. have undergone the Maillard Reaction). Roasters determine duration and temperature. Roasters are occasionally referred to as producers, especially within relationship-coffee purchases. For the sake of simplicity and with due consideration of the effect of roast, the scope of this project will endeavour to exclude coffees roasted beyond the “first crack.”
 
-6) Taste, as identified by cupping, to identify tasting traits (e.g. sweetness, acidity, mouthfeel, balance, flavour), tasting groups (e.g. citrus, berry, stone fruits, sweet, savoury, floral), and tasting notes (e.g. chocolate, raspberry, lemon, black tea, hazelnut, velvety). Overlap can exist both vertically and horizontally within this hierarchy: sweetness may describe sweet tasting notes like brown or cane sugars; whereas both sweetness and acidity may describe a sweet and citrus taste such as candied lemon. 
-
-\newpage
+6) Taste, as identified by cupping, to identify Tasting Traits (e.g. Sweet, Fruity, Texture, Roasted, Nutty/Cocoa), Tasting Groups (e.g. Citrus, Berry, Stone Fruits, Brown Sugar, Floral), and Tasting Notes (e.g. Chocolate, Raspberry, Lemon, Black Tea, Hazelnut, Velvety). Overlap can exist both vertically and horizontally within this hierarchy: sweetness may describe sweet tasting notes like brown or cane sugars; whereas both sweetness and acidity may describe a sweet and citrus taste such as candied lemon. 
 
 ## Appendix B: Datasheet for Dataset, v0.1
 
 Available here: https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week8/DataSheet-0.1.md 
 
-## Appendix C: Model Card
+## Appendix C: Model Card, v0.1
 
 Available here: https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week12/ModelCard.md 
-
-## Appendix D: 
