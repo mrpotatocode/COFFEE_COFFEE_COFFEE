@@ -5,8 +5,8 @@
 This contains:
 
 * The [Project's Plan](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/plan.md)
-* The [Coffee Paper](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/coffee%20paper.pdf) as a PDF.
-* The [Coffee Paper](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/coffee%20paper.Rmd) as a RMD.
+* The [Coffee Paper](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/coffee%20paper.pdf) as a PDF
+* The [Coffee Paper](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/coffee%20paper.Rmd) as a RMD
   * Underlying scripts can be found here:
     * [Build](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/tree/main/scripts/build)
     * [Analyze](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/tree/main/scripts/analyze) 
