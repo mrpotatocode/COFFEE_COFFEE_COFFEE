@@ -21,7 +21,7 @@ This ~~will be~~ is a repo for my coffee project.
 - [x] Write my first [Modelcard](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/journal/Week12/ModelCard.md) 
 - [x] Deploy [models](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/tree/main/outputs/models)
 - [x] Deploy [Predictive Shiny App](https://mrpotatocode.shinyapps.io/TastingNotePredictions/)
-- [ ] Write paper
+- [x] Write [paper](https://github.com/mrpotatocode/COFFEE_COFFEE_COFFEE/blob/main/Discussions/coffee%20paper.pdf)
 - [ ] Build Github pages for the project
 - [ ] Have an interesting README about the project
 - [ ] Drink a lot of coffee
