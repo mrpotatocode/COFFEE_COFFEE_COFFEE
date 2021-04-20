@@ -2,6 +2,10 @@ library(tidyverse)
 library(tidymodels)
 library(doFuture)
 
+####### IF RERUNING WITH NEW DATA ####### 
+####### YOU MUST UPDATE THE boosted_param OBJECT WITH NEW PARAMETERS ####### 
+####### THIS SHOULD BE DONE BY RUNNING multi_stacked_model.Rmd ####### 
+
 #set to 4 core processing
 registerDoFuture()
 cl <- parallel::makeCluster(4) 
@@ -30,6 +34,7 @@ tidy_boosted_model <- boost_tree(trees = tune(),
   set_mode("classification") %>% 
   set_engine("xgboost")
 
+####### UPDATE HERE ####### 
 #manually create best params -- tune was run elsewhere, no point in rerunning within this script
 boosted_param <- tribble(~"trees",~"min_n",~"tree_depth",~"learn_rate",~".config",
   as.integer(2000),as.integer(14),as.integer(1),0.1,as.factor('Preprocessor1_Model080'))

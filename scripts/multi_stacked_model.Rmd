@@ -1,0 +1,432 @@
+---
+title: "multi_stacked_model v0.1"
+author: "Thomas Rosenthal"
+date: "21/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+#library(drake)
+library(tidymodels)
+library(tidyverse)
+library(rvest)
+library(data.table)
+library(readxl)
+library(SnowballC)
+library(here)
+library(doFuture)
+```
+
+```{r}
+#function for fread (data.table)
+read_plus <- function(flnm) {
+    read_csv(flnm) %>% 
+        mutate(filename = flnm) %>% 
+        rename_with(str_to_title)}
+
+#tasting note folder
+tasting_folder = "inputs/data/Conformed/"
+```
+
+```{r}
+SCAA_Notes = 
+  #load tasting notes
+    read_xlsx(here::here(tasting_folder,'SCAA_TastingNotes.xlsx'))
+```
+
+```{r}
+  #load all data and merge it at once
+  #amazing writeup on how to do this here: https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once
+  raw_data = 
+    list.files(path = "../../Automatic_Drip/R/outputs/",
+      pattern = "*.csv",
+      full.names = T) %>% 
+    map_df(~read_plus(.))
+  
+```
+
+
+```{r}
+#SEY -- its still a bit funky, this might need some additional work later
+#currently we are just loading the oldest Sey archive and not updating it
+oldest_sey = raw_data %>% unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  filter(Filename %like% 'SeyArchive') %>% group_by(Filename) %>% arrange_(~ desc(Filename)) %>% filter(group_indices() == 1) %>% ungroup()
+
+#load newer_sey, currently not joined to project
+newer_seys = raw_data %>% unite(Variety, c(Variety, Varietal)) %>% 
+  unite(Processing, c(Processing, Process)) %>% 
+  filter(Filename %like% 'SeyArchive') %>% group_by(Filename) %>% arrange_(~ desc(Filename)) %>% filter(group_indices() != 1) %>% ungroup()
+
+#will need to create a sey 
+# plyr::match_df(newer_seys %>% select(Roaster, Coffeename, Region, Producer, Variety, Processing), 
+#                  oldest_sey %>%  select(Roaster, Coffeename, Region, Producer, Variety,Processing))
+
+# anti_join(newer_seys %>% select(Roaster, Coffeename, Producer, Variety, Processing), 
+#                    oldest_sey %>%  select(Roaster, Coffeename, Producer, Variety,Processing))
+
+sey_achive = oldest_sey #plus the anti join logic later
+#split tasting notes
+sey_achive = sey_achive %>% select(-Url, -Filename, -J, -Procesing) %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  mutate(Tastingnotes = str_replace_all(Tastingnotes,"/", ", ")) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+```
+
+
+```{r}
+#make ripes tibble for later
+ripes = tibble(words=c('red','yellow','pink','black','white','orange'))
+
+# split tasting notes
+data = raw_data %>% filter(Filename %like% 'SeyArchive' == FALSE) %>% unite(Variety, c(Variety, Varietal), na.rm = TRUE) %>% 
+  unite(Processing, c(Processing, Process), na.rm = TRUE) %>% 
+  select(-Url, -Filename, -J, -Procesing) %>% distinct() %>% 
+  mutate(Tastingnotes =  str_to_lower(Tastingnotes)) %>% 
+  mutate(Tastingnotes = str_replace_all(str_replace_all(Tastingnotes,"/", ", ")," & ",", ")) %>% 
+  separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = FALSE)
+
+#add sey archive
+data = rbind(data,sey_achive)
+
+#stem tasting groups
+data = data %>%
+  mutate(TastingNote1 = str_trim(TastingNote1, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote1 = wordStem(TastingNote1)) %>% 
+  mutate(TastingNote2 = str_trim(TastingNote2, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote2 = wordStem(TastingNote2)) %>% 
+  mutate(TastingNote3 = str_trim(TastingNote3, side = c("both", "left", "right"))) %>% 
+  mutate(TastingNote3 = wordStem(TastingNote3)) 
+
+#set encoding, e.g. rose ≠ rosé (rosé becomes ros'e)
+data <- data %>% mutate(TastingNote1 = iconv(TastingNote1, to='ASCII//TRANSLIT'), 
+                        TastingNote2 = iconv(TastingNote2, to='ASCII//TRANSLIT'),
+                        TastingNote3 = iconv(TastingNote3, to='ASCII//TRANSLIT'))
+
+#extract ripeness from processing
+data = data %>% mutate(Processing = str_to_lower(Processing)) %>% 
+  mutate(Red = str_extract(Processing, "red")) %>% 
+  mutate(Yellow = str_extract(Processing, "yellow")) %>%
+  mutate(Pink = str_extract(Processing, "pink")) %>%
+  mutate(Black = str_extract(Processing, "black")) %>%
+  mutate(White = str_extract(Processing, "white")) %>% 
+  mutate(Orange = str_extract(Processing, "orange")) 
+
+#extract ripeness from Variety, if ripeness isn't already present from processing 
+data = data %>% mutate(Variety = str_to_lower(Variety)) %>% 
+  mutate(Red = ifelse(is.na(data$Red), str_extract(Variety, "red"), Red)) %>% 
+  mutate(Yellow = ifelse(is.na(data$Yellow), str_extract(Variety, "yellow"), Yellow)) %>%
+  mutate(Pink = ifelse(is.na(data$Pink), str_extract(Variety, "pink"), Pink)) %>%
+  mutate(Black = ifelse(is.na(data$Black), str_extract(Variety, "black"), Black)) %>%
+  mutate(White = ifelse(is.na(data$White), str_extract(Variety, "white"), White)) %>% 
+  mutate(Orange = ifelse(is.na(data$Orange), str_extract(Variety, "orange"), Orange)) 
+
+#fix altitude to be integer (remove masl, m, etc), and average ranges (2000-2100) becomes 2050
+data = data %>% mutate(Altitude  = str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+  Altitude, "m,", " -"), " masl", ""),"masl", "")," m", ""),"m", ""),' - ','-'))
+data = data %>% mutate(Altitude = sapply(strsplit(data$Altitude, split = "-", fixed = TRUE), function(k) mean(as.numeric(k))))
+data$Altitude[is.nan(data$Altitude)] <- NA
+
+#remove ripeness from processing and variety
+data$Processing = str_replace_all(data$Processing, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+data$Variety = str_replace_all(data$Variety, str_c("\\b", str_c(ripes$words, collapse = "\\b( )?|"), "\\b( )?"), "")
+
+#split out multiple processes into a single Processing1 column (should include more later), e.g. Natural, Patio Dried
+data = data %>% mutate(Processing = str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+  Processing,", ", "|"), " - ","|"), "\\/","|"), " and ","|")) %>%   
+  separate(Processing, into = c("Processing1"), sep = "\\|",  remove = FALSE)
+
+#address some common spelling errors in varieties
+data = data %>% mutate(Variety = str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+  Variety, 'ethiopian','ethiopia'),'gesha','geisha'),'v. colombia','colombia'),'parainema','paraneima'),'sl 28','sl28'),'sl-28','sl28'))
+
+#split out varieties into four columns 
+data = data %>% mutate(Variety = str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(
+  Variety,", ", "|"), " and ","|"), " \\+ ","|"), "and ","|")," & ","|"),"& ","|"), " - ","|")) %>%   
+  separate(Variety, into = c("Variety1","Variety2","Variety3","Variety4"), sep = "\\|",  remove = FALSE)
+
+#incorporate ripeness values
+data = data %>%unite(Ripeness, c(Red, Yellow, Pink, Black, White, Orange), na.rm=TRUE)
+
+#replace red_yellow with a single colour "orange" 
+data = data %>% mutate(Ripeness = ifelse(Ripeness == 'red_yellow', "orange", Ripeness))
+
+data = data %>% mutate(Country = str_to_lower(Country))
+
+data <- data %>%
+  mutate(across(everything(), ~ifelse(.=="", NA, as.character(.))))
+```
+
+```{r}
+head(data)
+```
+
+
+```{r}
+#stem tasting notes table (SCAA_Notes)
+SCAA_Notes <- SCAA_Notes %>% 
+  mutate(l_note =  str_to_lower(Note))%>% 
+  mutate(l_note = str_trim(l_note, side = c("both", "left", "right"))) %>% 
+  
+  #remove plurals, basic stemming
+  mutate(l_note = wordStem(l_note)) %>% 
+  
+  #fix encoding
+  mutate(l_note = iconv(l_note, to='ASCII//TRANSLIT'))
+```
+
+
+```{r}
+#merge data with SCAA_Notes -- include the hierarchy for all three tasting notes
+merged_data =
+  sqldf::sqldf("select d.*, n1.Trait as Trait1, n1.[Group] as Group1
+              ,n2.Trait as Trait2, n2.[Group] as Group2
+              ,n3.Trait as Trait3, n3.[Group] as Group3              
+              from data d
+              left join SCAA_Notes n1 on trim(n1.l_note) = trim(d.TastingNote1)
+              left join SCAA_Notes n2 on trim(n2.l_note) = trim(d.TastingNote2)
+              left join SCAA_Notes n3 on trim(n3.l_note) = trim(d.TastingNote3)
+              ")
+```
+
+```{r}
+#update tasting notes that are missing manually (for 1,2,3)
+merged_data %>% select(Tastingnotes,TastingNote3,Trait3, ) %>% distinct() %>%  
+  filter(is.na(Trait3))
+```
+
+```{r}
+#remove any duplicates
+merged_data = merged_data %>% distinct()
+
+skimr::skim(merged_data)
+```
+
+```{r}
+##TRAIT 1
+#select modelling columns
+pre_prep_data = merged_data %>% select(Variety1, Processing1, Country, Group1, Group2, Group3 ) 
+
+#remove low variance varieties
+pre_prep_data = pre_prep_data %>% group_by(Variety1) %>% filter(!is.na(Variety1)) %>% 
+  filter(n() >= 5) 
+
+#remove low variance processes
+pre_prep_data = pre_prep_data %>% group_by(Processing1) %>% filter(!is.na(Processing1)) %>%
+  filter(n() >= 5)
+
+```
+
+
+```{r}
+#stack tasting notes
+prep_data = melt(pre_prep_data, id.vars=1:3) #id.vars=1:4
+prep_data = prep_data %>% drop_na(value) %>% select(-variable) %>% rename('TastingGroup' = value)
+```
+
+```{r}
+#write to shiny folder with prep_data
+path_out = paste0(here::here(), '/Tamatoa/Third/CoffeeModel/data/')
+
+file_name = paste0(path_out, "shiny_data.csv")
+write_csv(prep_data,file_name)
+```
+
+```{r}
+prep_data %>% group_by(TastingGroup) %>% summarize(n = n())
+
+prep_data %>% group_by(Country) %>% summarize(n = n())
+prep_data %>% group_by(Variety1) %>% summarize(n = n())
+prep_data %>% group_by(Processing1) %>% summarize(n = n())
+```
+
+```{r}
+all_cores <- parallel::detectCores(logical = FALSE)
+
+registerDoFuture()
+cl <- parallel::makeCluster(4) #all_cores
+plan(cluster, workers = cl)
+```
+
+
+```{r}
+#Rsample pacakge example 
+## Create the train and test sets using Rsample
+set.seed(42)
+tidy_split <- initial_split(prep_data, prop = .75)
+tidy_train <- training(tidy_split)
+tidy_test <- testing(tidy_split)
+tidy_kfolds <- vfold_cv(tidy_train)
+```
+
+```{r}
+#Recipes package 
+## For preprocessing, feature engineering, and feature elimination 
+tidy_rec <- recipe(TastingGroup ~., data = tidy_train) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors())
+
+summary(tidy_rec)
+```
+
+```{r}
+# Parsnip package 
+## Standardized api for creating models 
+tidy_boosted_model <- boost_tree(trees = tune(),
+                                min_n = tune(),
+                                learn_rate = tune(),
+                                tree_depth = tune()) %>% 
+  set_mode("classification") %>% 
+  set_engine("xgboost")
+```
+
+```{r}
+# Dials creates the parameter grids 
+# Tune applies the parameter grid to the models 
+# Dials pacakge 
+boosted_grid <- grid_regular(parameters(tidy_boosted_model), levels = 4)
+rf_grid <- grid_regular(parameters(tidy_rf_model), levels = 10)
+svm_grid <- grid_regular(parameters(tidy_svm_model), levels = 5)
+
+# Tune package 
+boosted_tune <- tune_grid(tidy_boosted_model,
+          tidy_rec,
+          resamples = tidy_kfolds,
+          grid = boosted_grid)
+```
+
+```{r}
+#Use Tune package to extract best parameters using ROC_AUC handtill
+boosted_param <- boosted_tune %>% select_best("roc_auc")
+#boosted_param <- boosted_tune %>% select_best("accuracy")
+
+#Apply parameters to the models
+tidy_boosted_model <- finalize_model(tidy_boosted_model, boosted_param)
+```
+
+```{r}
+# Workflow package 
+# For combining model, parameters, and preprocessing
+boosted_wf <- workflow() %>% 
+  add_model(tidy_boosted_model) %>% 
+  add_recipe(tidy_rec)
+```
+
+```{r}
+# Yardstick package
+# For extracting metrics from the model 
+boosted_res <- last_fit(boosted_wf, tidy_split)
+
+bind_rows(
+  boosted_res %>% mutate(model = "xgb")
+) %>% 
+  unnest(.metrics)
+
+boosted_res %>% unnest(.predictions) %>% 
+  conf_mat(truth = TastingGroup, estimate = .pred_class)
+```
+
+```{r}
+# Fit the entire data set using the final wf 
+final_boosted_model <- fit(boosted_wf, prep_data)
+
+#saveRDS(final_boosted_model, "../outputs/models/xboost_coffee_group_all_v2.rds")
+```
+
+```{r}
+#write to shiny folder with final_boosted_model
+# path_out = paste0(here::here(), '/Tamatoa/Third/CoffeeModel/data/')
+
+# model_name = paste0(path_out, "xboost_coffee_group_all_v2.rds")
+#saveRDS(final_boosted_model,model_name)
+```
+
+```{r}
+boosted_res %>% mutate(model = "xgb") %>% 
+  unnest(.metrics) 
+```
+
+```{r}
+conf_mat_b <- boosted_res %>% unnest(.predictions) %>% 
+  conf_mat(truth = TastingGroup, estimate = .pred_class)
+```
+
+```{r}
+`<|°_°|>` <-  autoplot(conf_mat_b, type = "heatmap") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+png("../Discussions/imgs/confusion_matrix.png")
+print(`<|°_°|>`)
+dev.off()
+
+`<|°_°|>`
+```
+
+
+
+
+```{r}
+#calculate accuracy
+#select possible inputs
+selected = prep_data %>% select(Variety1,Processing1,Country) %>% filter(!is.na(Country)) %>% distinct()
+
+#produce top 3 predictions per input combination
+motha_frockin_accuracy_n_shiz <- data.frame()
+for(i in 1:nrow(selected)){
+  answer <- predict(
+    final_boosted_model,
+    selected %>% dplyr::slice(i),
+    type = "prob"
+  ) %>% 
+    gather() %>% 
+    arrange(desc(value)) %>% 
+    top_n(3)
+  
+  #bind
+  motha_frockin_accuracy_n_shiz <- rbind(motha_frockin_accuracy_n_shiz,answer)
+}
+
+#add an id for each prediction
+motha_frockin_accuracy_n_shiz$id <- c(0, rep(1:(nrow(motha_frockin_accuracy_n_shiz)-1)%/%3))
+#adjust so first id = 1 instead of 0
+motha_frockin_accuracy_n_shiz$id <- motha_frockin_accuracy_n_shiz$id+1
+
+#remove the label ".pred_" produced by the predict() fx
+motha_frockin_accuracy_n_shiz <- motha_frockin_accuracy_n_shiz %>% 
+  mutate(note = key %>% str_remove(".pred_"), .keep = "unused")
+
+#move note to the first column
+motha_frockin_accuracy_n_shiz <- motha_frockin_accuracy_n_shiz %>% select(note, everything())
+
+#merge back to selected so we have the coffee details associated with each predictions 
+selected_predictions <- merge(motha_frockin_accuracy_n_shiz,mutate(selected, id = rownames(selected)))
+
+#add coffee index
+pre_prep_data$idx = rownames(pre_prep_data)
+#add the actual tasting groups for all coffees back
+final_accuracy <- sqldf::sqldf('select distinct idx, s.*,Group1,Group2,Group3 
+                          from selected_predictions s 
+                          join pre_prep_data p on s.Variety1 = p.Variety1 
+                            and s.Processing1 = p.Processing1 
+                            and s.Country = p.Country')
+
+#add a boolean whether the predicted note matches one of the three tasting groups
+final_accuracy <- final_accuracy %>% 
+  mutate(Group1_c = note == Group1, Group2_c = note == Group2, Group3_c = note == Group3)
+
+#quantify how many true/false labels per column
+correct_predictions <- table(final_accuracy=='TRUE', names(final_accuracy)[col(final_accuracy)]) %>% data.frame()
+
+#model accuracy:
+accu <- correct_predictions %>% filter(Var1 == TRUE, Var2 %like% '_c') %>% select(-Var1) %>% transpose(make.names	='Var2')
+
+accu$Correct <- as.numeric(correct_predictions %>% filter(Var1 == TRUE) %>% summarize(freq = sum(Freq)))
+accu$Total <- nrow(final_accuracy)
+accu$Accuracy <- as.numeric(accu$Correct/accu$Total)
+
+
+accu
+```
