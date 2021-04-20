@@ -475,20 +475,20 @@ x <- table(le_fin=='TRUE', names(le_fin)[col(le_fin)])
 ```{r message=FALSE}
 library(treemap)
 
-treemap(prep_data %>% group_by(TastingGroup, Variety1) %>% summarize(n = n()),
-            index=c("TastingGroup",'Variety1'),
+treemap(prep_data %>% group_by(Variety1, TastingGroup) %>% summarize(n = n()),
+            index=c("Variety1",'TastingGroup'),
             vSize="n",
             type="index"
             )
 
-treemap(prep_data %>% group_by(TastingGroup, Country) %>% summarize(n = n()),
-            index=c("TastingGroup",'Country'),
+treemap(prep_data %>% group_by(Country, TastingGroup) %>% summarize(n = n()),
+            index=c("Country",'TastingGroup'),
             vSize="n",
             type="index"
             )
 
-treemap(prep_data %>% group_by(TastingGroup, Processing1) %>% summarize(n = n()),
-            index=c("TastingGroup",'Processing1'),
+treemap(prep_data %>% group_by(Processing1, TastingGroup) %>% summarize(n = n()),
+            index=c("Processing1",'TastingGroup'),
             vSize="n",
             type="index"
             )

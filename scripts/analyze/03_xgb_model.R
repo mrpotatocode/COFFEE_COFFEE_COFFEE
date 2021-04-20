@@ -53,3 +53,54 @@ conf_mat_b <- boosted_res %>% unnest(.predictions) %>%
 
 #fit final model
 final_boosted_model <- fit(boosted_wf, prep_data)
+
+#calculate accuracy
+#select possible inputs
+selected = prep_data %>% select(Variety1,Processing1,Country) %>% filter(!is.na(Country)) %>% distinct()
+
+#produce top 3 predictions per input combination
+motha_frockin_accuracy_n_shiz <- data.frame()
+for(i in 1:nrow(selected)){
+  answer <- predict(
+    final_boosted_model,
+    selected %>% dplyr::slice(i),
+    type = "prob"
+  ) %>% 
+    gather() %>% 
+    arrange(desc(value)) %>% 
+    top_n(3)
+  
+  #bind
+  motha_frockin_accuracy_n_shiz <- rbind(motha_frockin_accuracy_n_shiz,answer)
+}
+
+#add an id for each prediction
+motha_frockin_accuracy_n_shiz$id <- c(0, rep(1:(nrow(motha_frockin_accuracy_n_shiz)-1)%/%3))
+#adjust so first id = 1 instead of 0
+motha_frockin_accuracy_n_shiz$id <- motha_frockin_accuracy_n_shiz$id+1
+
+#remove the label ".pred_" produced by the predict() fx
+motha_frockin_accuracy_n_shiz <- motha_frockin_accuracy_n_shiz %>% 
+  mutate(note = key %>% str_remove(".pred_"), .keep = "unused")
+
+#move note to the first column
+motha_frockin_accuracy_n_shiz <- motha_frockin_accuracy_n_shiz %>% select(note, everything())
+
+#merge back to selected so we have the coffee details associated with each predictions 
+selected_predictions <- merge(motha_frockin_accuracy_n_shiz,mutate(selected, id = rownames(selected)))
+
+#add coffee index
+pre_prep_data$idx = rownames(pre_prep_data)
+#add the actual tasting groups for all coffees back
+final_accuracy <- sqldf::sqldf('select distinct idx, s.*,Group1,Group2,Group3 
+                          from selected_predictions s 
+                          join pre_prep_data p on s.Variety1 = p.Variety1 
+                            and s.Processing1 = p.Processing1 
+                            and s.Country = p.Country')
+
+#add a boolean whether the predicted note matches one of the three tasting groups
+final_accuracy <- final_accuracy %>% 
+  mutate(Group1_c = note == Group1, Group2_c = note == Group2, Group3_c = note == Group3)
+
+#quantify how many true/false labels per column
+correct_predictions <- table(final_accuracy=='TRUE', names(final_accuracy)[col(final_accuracy)]) %>% data.frame()

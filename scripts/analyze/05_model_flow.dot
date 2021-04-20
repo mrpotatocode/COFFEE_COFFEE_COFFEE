@@ -1,11 +1,10 @@
-digraph boxes_and_circles {
-  graph [label = "Diagram 1: Coffee Model Workflow", fontsize=14, layout = dot, compound=true]
+digraph model_flow {
   rankdir="TB";
-  
+  graph [layout = dot, compound=true]
   node [shape = box, fontname = Helvetica,  style = filled, fillcolor = Linen]
   
   subgraph cluster_8oz {
-    graph[overlap = false, fontsize = 10]
+    graph [overlap = false, fontsize = 10]
     label = "Primary Data Collection (Weekly Eight Ounce Coffee Scraping)"
     style=dashed;
     fontname = "helvetica-bold";
@@ -19,10 +18,11 @@ digraph boxes_and_circles {
     scrape [label =  ' GitHub \n Actions \n Jobs', fixedsize = true, height = 1, width = 1]    
          
     {data1 data2 data3 data4} -> scrape
+    
 	}
 	
 	subgraph cluster_secondary {
-	  graph[overlap = false, fontsize = 10]
+	  graph [overlap = false, fontsize = 10]
 	  label = "Secondary Collection (Single Instance Scraping)"
     style=dashed;
 		fontname = "helvetica-bold";
@@ -33,7 +33,7 @@ digraph boxes_and_circles {
     data7 [label = 'Yonder', shape = folder, fillcolor = Beige]
     
       subgraph cluster_3wave {
-        graph[overlap = false, fontsize = 10]
+        graph [overlap = false, fontsize = 10]
         label = "Th3rd Wave"
         style=dashed;
   		  color= "#625a5a";
@@ -41,68 +41,70 @@ digraph boxes_and_circles {
   		  
   		  data8 [label = 'Toronto \n Roasters', shape = folder, fillcolor = Beige]
   		  data9 [label = 'Montreal\n  Roasters', shape = folder, fillcolor = Beige]
+  		  
       }
          
-      {data5 data6 data7 data8 data9} 
+    {data5 data6 data7 data8 data9} 
+    
 	}
   
-gh [label = 'GitHub \n Pull \n Request', fixedsize = true, 'width' = '1', 'height' =  '1']
+  gh [label = 'GitHub \n Pull \n Request', fixedsize = true, 'width' = '1', 'height' =  '1']
   
-{scrape -> gh [ltail=cluster_8oz, minlen=2]} 
+  {scrape -> gh [ltail=cluster_8oz, minlen=2]} 
   
   subgraph cluster_SCA {
-      graph[overlap = false, fontsize = 10]
-      rank="same";
-  	  label = "SCA Conformed DataSet"
-      style=dashed;
-  		fontname = "helvetica-bold";
-  	  node [shape=box, style=filled, color=black];
+    graph [overlap = false, fontsize = 10]
+    rank="same";
+	  label = "SCA Conformed DataSet"
+    style=dashed;
+		fontname = "helvetica-bold";
+	  node [shape=box, style=filled, color=black];
+    
+    SCA [label = 'SCA \n Tasting \n Wheel', shape = folder,  fillcolor = Beige]
+    SCA_update [label = 'Update \n Notes', shape = oval, fillcolor = "blue", fontcolor = white, height = 1]
+    stem [label = 'string \n stemming', fixedsize = true, 'width' = '1', 'height' =  '1']
+    merge [label = 'merge \n Tasting \n Notes', fixedsize = true, 'width' = '1', 'height' =  '1']
       
-      SCA [label = 'SCA \n Tasting \n Wheel', shape = folder,  fillcolor = Beige]
-      SCA_update [label = 'Update \n Notes', shape = oval, fillcolor = "blue", fontcolor = white, height = 1]
-      stem [label = 'string \n stemming', fixedsize = true, 'width' = '1', 'height' =  '1']
-      merge [label = 'merge \n Tasting \n Notes', fixedsize = true, 'width' = '1', 'height' =  '1']
-        
-      {SCA -> SCA_update -> SCA -> stem -> merge}
+    {SCA -> SCA_update -> SCA -> stem -> merge}
+    
   	}
 
   subgraph cluster_data {
-      graph[overlap = false, fontsize = 10]
-      rank="same";
-  	  label = "DataSet Creation"
-      style=dashed;
-  		fontname = "helvetica-bold";
-  	  node [shape=box, style=filled, color=black]
-  	  node [fixedsize = true, 'width' = '1', 'height' =  '1']
+    graph [overlap = false, fontsize = 10]
+    rank="same";
+	  label = "DataSet Creation"
+    style=dashed;
+		fontname = "helvetica-bold";
+	  node [shape=box, style=filled, color=black]
+	  node [fixedsize = true, 'width' = '1', 'height' =  '1']
+    
+    load [label = 'map_df & \n read_csv',]
+    extract [label = 'feature \n extraction']
+    clean [label = 'clean data']
       
-      load [label = 'map_df & \n read_csv',]
-      extract [label = 'feature \n extraction']
-      clean [label = 'clean data']
-        
-      {load -> extract -> clean}
+    {load -> extract -> clean}
       
-  	}
+  }
 
-data5 data6 data7 data8 data9 :s -> clean:e [ltail='cluster_secondary' lhead=cluster_data,minlen=2] 
-gh:s -> load:w [ltail='cluster_secondary' lhead=cluster_data,minlen=2] 
-extract:s -> SCA:n [ltail='cluster_data' lhead=cluster_SCA,minlen=3]
-
+  data5 data6 data7 data8 data9 :s -> clean:e [ltail='cluster_secondary' lhead=cluster_data,minlen=2] 
+  gh:s -> load:w [ltail='cluster_secondary' lhead=cluster_data,minlen=2] 
+  extract:s -> SCA:n [ltail='cluster_data' lhead=cluster_SCA,minlen=3]
 
   subgraph cluster_model {
-      graph[overlap = false, fontsize = 10]
-      rank="same";
-  	  label = "Tidy Models"
-      style=dashed;
-  		fontname = "helvetica-bold";
-  	  node [shape=box, style=filled, color=black, fillcolor = Linen];
-      node [fixedsize = true, 'width' = '1.15', 'height' =  '1.35']
-      m1 [label = 'melt \n Tasting \n Predictors', shape = box, fixedsize = true, 'width' = '1', 'height' =  '1']
-      m2 [label = 'train \n test split', shape = hexagon, fillcolor = "#29794a", fontcolor = white, orientation=90]
-      m3 [label = 'step dummy \n variables', shape = hexagon, fillcolor = "#90cddc", orientation=30]
-      m4 [label = 'boosted tree \n (XGBoost)', shape = hexagon, fillcolor = "#f9f5bb", orientation=30]
-      m5 [label = 'parameter \n grid', shape = hexagon, fillcolor = "#c49a6c", orientation=30]
-      
-  	  {m1 -> m2 -> m3 -> m4 -> m5}
+    graph [overlap = false, fontsize = 10]
+    rank="same";
+	  label = "Tidy Models"
+    style=dashed;
+		fontname = "helvetica-bold";
+	  node [shape=box, style=filled, color=black, fillcolor = Linen];
+    node [fixedsize = true, 'width' = '1.15', 'height' =  '1.35']
+    m1 [label = 'melt \n Tasting \n Predictors', shape = box, fixedsize = true, 'width' = '1', 'height' =  '1']
+    m2 [label = 'train \n test split', shape = hexagon, fillcolor = "#29794a", fontcolor = white, orientation=90]
+    m3 [label = 'step dummy \n variables', shape = hexagon, fillcolor = "#90cddc", orientation=30]
+    m4 [label = 'boosted tree \n (XGBoost)', shape = hexagon, fillcolor = "#f9f5bb", orientation=30]
+    m5 [label = 'parameter \n grid', shape = hexagon, fillcolor = "#c49a6c", orientation=30]
+    
+	  {m1 -> m2 -> m3 -> m4 -> m5}
       
       subgraph cluster_model_cont {
     	  node [shape=box, style=filled, color=black, fillcolor = "#91cf60"];
@@ -114,31 +116,32 @@ extract:s -> SCA:n [ltail='cluster_data' lhead=cluster_SCA,minlen=3]
         m9 [label = 'evaluate \n metrics', shape = hexagon, fillcolor = "#ca3631", fontcolor = white, orientation=30]
         m10 [label = 'fit \n model', shape = hexagon, fillcolor = "#54bfd3", fontcolor = white, orientation=30]
         
-  	    {m6 -> m7-> m8 -> m9 -> m10} 
-  	  }
+  	    {m6 -> m7-> m8 -> m9 -> m10}
+  	    
+      }
   	  
   	 m5 -> m6 
   }
   	
-SCA -> m2 [ltail=cluster_SCA lhead=cluster_model, minlen=3]
+  SCA -> m2 [ltail=cluster_SCA lhead=cluster_model, minlen=3]
 
- subgraph cluster_shiny {
-      graph[overlap = false, fontsize = 10]
-      rank="same";
-  	  label = "Presentation Layer"
-      style=dashed;
-  		fontname = "helvetica-bold";
-  	  node [shape=box, style=filled, color=black];
-  	  node [fixedsize = true, 'width' = '1', 'height' =  '1']
-  	  
-  	  shiny [label = '\n shiny \n app', shape = star, fillcolor = yellow,fixedsize = true, 'width' = '1.5', 'height' =  '1.5']
-      paper [shape = Msquare, fillcolor = white, fontcolor = black]
-      loadmodel [label = 'load \n model']
-       
-      
-      {loadmodel -> shiny}
-  	  }
+  subgraph cluster_shiny {
+    graph [overlap = false, fontsize = 10]
+    rank="same";
+	  label = "Presentation Layer"
+    style=dashed;
+		fontname = "helvetica-bold";
+	  node [shape=box, style=filled, color=black];
+	  node [fixedsize = true, 'width' = '1', 'height' =  '1']
+	  
+	  shiny [label = '\n shiny \n app', shape = star, fillcolor = yellow,fixedsize = true, 'width' = '1.5', 'height' =  '1.5']
+    paper [shape = Msquare, fillcolor = white, fontcolor = black]
+    loadmodel [label = 'load \n model']
+     
+    {loadmodel -> shiny}
+    
+  }
 
-m8 -> shiny [ltail=cluster_model lhead=cluster_shiny, minlen=3]
+  m8 -> shiny [ltail=cluster_model lhead=cluster_shiny, minlen=3]
 
 }

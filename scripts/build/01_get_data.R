@@ -10,15 +10,19 @@ read_plus <- function(flnm) {
     rename_with(str_to_title)}
 
 #tasting note folder
-tasting_folder <-  "inputs/data/Conformed/"
+tasting_folder <- "inputs/data/Conformed/"
 
 SCAA_Notes <-  
   #load tasting notes
   read_xlsx(here::here(tasting_folder,'SCAA_TastingNotes.xlsx'))
 
-#load data with data.table
-raw_data <-  
-  list.files(path = "../../Automatic_Drip/R/outputs/",
-             pattern = "*.csv",
-             full.names = T) %>% 
-  map_df(~read_plus(.))
+###UPDATED FOR PAPER, JUST LOAD A STATIC CSV, that way the values in the paper do not update
+
+#load all data from Automatic_Drip
+#raw_data <-  
+#  list.files(path = "../../Automatic_Drip/R/outputs/",
+#             pattern = "*.csv",
+#             full.names = T) %>% 
+#  map_df(~read_plus(.))
+
+raw_data <- read_csv('data/paper_dataset.csv')
