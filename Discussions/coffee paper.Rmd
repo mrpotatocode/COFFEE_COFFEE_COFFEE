@@ -386,17 +386,17 @@ While the results of this study were limited by the size of the dataset, the dat
 
 Gagné produced flavor wheels for five common Varieties (Bourbon, SL28, Heirlooms, Caturra, Geisha) of Washed coffees, and word clouds for 14 Varieties and 11 Processes (five of which were Ripeness + Honey, and two other infrequent but well-known processes - carbonic and anaerobic). Gagné's work did not include prediction, but rather frequency visualizations of 1500 coffees. When comparing these flavor wheels to the model, two matches stand out: Kenya + SL28 + Washed is predominantly Berry Fruit with Other Fruit and Citrus Fruit Tasting Groups (see **Figure \@ref(fig:shiny)** for model output); similarly, Ethiopia + Heirloom + Washed is predominantly Floral with Stone Fruit and Citrus Fruit, though Black Tea was not predicted as the dominant Tasting Group. It is difficult to compare results beyond SL28 and Heirloom Varieties, which appear almost exclusively in Kenya and Ethiopia, respectively. Varieties that appear throughout the world, such as Bourbon or Caturra, have much more variety in their predictions than Gagné's work, which generalizes Bourbon regardless of Country of origin. Gagné's work cannot be compared to model predictions for Processes other than Washed.
 
-Conley and Wilson’s models classified Costa Rican Tasting Notes as Stone Fruit (Cherry), Sweet/Brown Sugar (Sugar Cane, Brown Sugar, Syrup, Sweet), and Vanilla. Without knowing either Variety or Process, the best way to draw comparisons with the model was to find the most commonly occurring Costa Rican coffees in the dataset: Caturra + Washed, Caturra + Natural, Caturra + Honey, and Catuai + Washed. Of these, all predictions produced Brown Sugar as a Tasting Group, and three of four produced Stone Fruit (**Table \@ref(tab:costarica)**). Because Conley and Wilson have used a very small subset of Tasting Notes, placing them within Tasting Groups potentially eliminates the nuance of their analysis, while substituting the complexity of this model. This may suggest that coffees are easier to overgeneralize than specifically predict, but without a greater number of Tasting Notes and more specificity of Variety and Process, it is hard to differentiate the model results from one another.  
+Conley and Wilson’s models classified Costa Rican Tasting Notes as Stone Fruit (Cherry), Sweet/Brown Sugar (Sugar Cane, Brown Sugar, Syrup, Sweet), and Vanilla. Without knowing either Variety or Process, the best way to draw comparisons with the model was to find the most commonly occurring Costa Rican coffees in the dataset: Caturra + Natural, Catuai + Honey, Catuai + Washed, Caturra + Washed, Caturra + Honey. Of these, four of five predictions produced Brown Sugar as a Tasting Group, and four of five produced Stone Fruit (**Table \@ref(tab:costarica)**). None produced predictions of Vanilla. Because Conley and Wilson have used a very small subset of Tasting Notes, placing them within Tasting Groups potentially eliminates the nuance of their analysis, while substituting the complexity of this model. This may suggest that coffees are easier to overgeneralize than specifically predict, but without a greater number of Tasting Notes and more specificity of Variety and Process, it is hard to differentiate the model results from one another.  
 
 ```{r costarica}
 #create the itemset variable
 comp_t <- pre_prep_data %>% unite(., ItemSet, Country,Variety1,Processing1, sep = " + ", remove = FALSE) %>% ungroup()
 
 #get the four most frequent itemsets for costa rica
-cr_4 <- comp_t %>% filter(Country == 'costa rica') %>% group_by(ItemSet) %>% summarize(n = n()) %>% top_n(4)
+cr_5 <- comp_t %>% filter(Country == 'costa rica') %>% group_by(ItemSet) %>% summarize(n = n()) %>% arrange(desc(n)) %>% top_n(5)
 
 #push the variables into model
-comp_t <- comp_t %>% filter(ItemSet %in% cr_4$ItemSet) %>% select(Variety1, Processing1, Country) %>% distinct()
+comp_t <- comp_t %>% filter(ItemSet %in% cr_5$ItemSet) %>% select(Variety1, Processing1, Country) %>% distinct()
 
 #get predictions
 cr_preds <- data.frame()
@@ -435,7 +435,9 @@ cr_pred_fin <- cr_preds %>% pivot_wider(names_from = idx ,values_from = note) %>
   select(-id) %>% rename(TG_Pred1 = `1`, TG_Pred2 = `2`, TG_Pred3 = `3`) %>% 
   mutate_all(funs(str_to_title(.))) %>% unite(., ItemSet, Country,Variety1,Processing1, sep = " + ")
 
-kable(cr_pred_fin, caption="Most Frequently Occurring Costa Rican Coffee Predictions", booktabs = TRUE, linesep= "") %>% 
+
+kable(cr_pred_fin %>% arrange(ItemSet), 
+  caption="Most Frequently Occurring Costa Rican Coffees and their Predictions", booktabs = TRUE, linesep= "") %>% 
   kableExtra::kable_styling(latex_options = c("stripped", "HOLD_position"))
 ```
 
@@ -445,7 +447,7 @@ Since the combination of these two bodies of work has not yet been established e
 
 Contextualizing the model's results within the dataset is a complex endeavour. While measuring the model's accuracy against individual coffees is useful to quantify the model's quality on the whole, the prevalence of three Tasting Groups is not necessarily a good determinate of any set of coffee attributes. To draw any valid conclusions, a set of coffee attributes needs to have a low diversity of Tasting Groups _and_ the model needs to predict the most frequent (or majority) of Tasting Groups as they appear within the dataset.
 
-Two coffees within **Figure \@ref(fig:treemap)** show a simplified version of this problem. The first, Costa Rica + Caturra + Natural, is predicted by the model to taste of Other Fruit, Berry Fruit, and Nutty. The first two Tasting Groups are the most frequent (and thus largest squares within the figure), but Body, Brown Sugar, Dried Fruit, and Vanilla are equally as frequent as Berry Fruit (all coloured as light green), and the third model prediction, Nutty, does not appear at all. As such, the predicted Tasting Groups represent the minority of occurring Tasting Groups (the overall square describing the coffee's attributes is less than half of the predicted Tasting Groups). This suggests that the model does not represent these coffees with sufficient nuance; simply put, there are too many other valid Tasting Groups for the itemset. 
+Two coffees within **Figure \@ref(fig:treemap)** show a simplified version of this problem. The first, Costa Rica + Caturra + Natural, is predicted by the model to taste of Other Fruit, Berry Fruit, and Nutty (see **Table \@ref(tab:costarica)** for all Costa Rican predictions). The first two Tasting Groups are the most frequent (and thus largest squares within the figure), but Body, Brown Sugar, Dried Fruit, and Vanilla are equally as frequent as Berry Fruit (all coloured as light green), and the third model prediction, Nutty, does not appear at all. As such, the predicted Tasting Groups represent the minority of occurring Tasting Groups (the overall square describing the coffee's attributes is less than half of the predicted Tasting Groups). This suggests that the model does not represent these coffees with sufficient nuance; simply put, there are too many other valid Tasting Groups for the itemset. 
 
 This can be contrasted with Costa Rica + Catuai + Honey, where Other Fruit, Brown Sugar, and Stone Fruit (the model predictions) represent the majority of occurring Tasting Groups (only Dried Fruit occurs more frequently). Conclusions made based on the model's outcomes for this attribute set will be more reliable as the coffees show less Tasting Group diversity. 
 
