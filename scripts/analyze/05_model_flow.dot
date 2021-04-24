@@ -55,7 +55,7 @@ digraph model_flow {
   subgraph cluster_SCA {
     graph [overlap = false, fontsize = 10]
     rank="same";
-	  label = "SCA Conformed DataSet"
+	  label = "SCA Conformed Dataset"
     style=dashed;
 		fontname = "helvetica-bold";
 	  node [shape=box, style=filled, color=black];
@@ -72,7 +72,7 @@ digraph model_flow {
   subgraph cluster_data {
     graph [overlap = false, fontsize = 10]
     rank="same";
-	  label = "DataSet Creation"
+	  label = "Dataset Creation"
     style=dashed;
 		fontname = "helvetica-bold";
 	  node [shape=box, style=filled, color=black]
@@ -134,8 +134,8 @@ digraph model_flow {
 	  node [shape=box, style=filled, color=black];
 	  node [fixedsize = true, 'width' = '1', 'height' =  '1']
 	  
-	  shiny [label = '\n shiny \n app', shape = star, fillcolor = yellow,fixedsize = true, 'width' = '1.5', 'height' =  '1.5']
-    paper [shape = Msquare, fillcolor = white, fontcolor = black]
+	  shiny [label = '\n Shiny \n App', shape = star, fillcolor = yellow,fixedsize = true, 'width' = '1.5', 'height' =  '1.5']
+    Paper [shape = Msquare, fillcolor = white, fontcolor = black]
     loadmodel [label = 'load \n model']
      
     {loadmodel -> shiny}
