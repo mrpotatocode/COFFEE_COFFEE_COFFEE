@@ -44,6 +44,7 @@ library(ggplot2)
 library(ggthemes)
 library(bookdown)
 library(rworldmap)
+library(treemap)
 ```
 
 ```{r getdata, include=FALSE}
