@@ -3,7 +3,7 @@ title: |
   ![](mrpotatocode_banner.png){width=7in}  
   Coffee & Machine Learning: An Exploration into the Attributes that Define Single-Origin Coffees
 author: "Thomas Rosenthal"
-date: "April 1, 2021"
+date: "April 24, 2021"
 header-includes:
    \usepackage{float}
    \floatplacement{figure}{H}
