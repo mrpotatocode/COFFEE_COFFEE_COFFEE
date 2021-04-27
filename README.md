@@ -1,9 +1,8 @@
-# EVERYTHING THAT STARTS GETS FINISHED
+## Coffee & Machine Learning: An Exploration into the Attributes that Define Single-Origin Coffees
 
-Wait, that's not true at all.
+### Paper Abstract
 
-This ~~will be~~ is a repo for my coffee project.
-
+In this work, a boosted tree model explores whether combinations of unique coffee attributes can predict the tastes of specialty coffees. The attributes of 550 coffees, collected over a period of four months, include the coffee's country of origin, variety (subspecies), processing method, harvest characteristics (like altitude and season of harvest), and tastes generated through consistent cupping practices. These defining attributes are used as predictors for 22 distinct tasting groups and then compared to actual specialty coffees and found to often match two out of every three tasting groups provided by coffee roasters.  
 
 ### Current Roadmap
 
