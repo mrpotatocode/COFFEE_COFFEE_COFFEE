@@ -1,0 +1,58 @@
+---
+title: "Tasting Note String Similarity"
+author: "Thomas Rosenthal"
+date: "20/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+load(here::here("model_base.RData"))
+```
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(tidystringdist)
+```
+
+```{r}
+data
+```
+
+
+```{r}
+data_quality <- 
+  melt(merged_data %>% 
+         select(Tastingnotes) %>% 
+         separate(Tastingnotes, into = c("TastingNote1","TastingNote2","TastingNote3"), sep = ",",  remove = TRUE) %>% 
+         mutate(TastingNote1 = str_trim(TastingNote1, side = c("both", "left", "right")),
+                TastingNote2 = str_trim(TastingNote2, side = c("both", "left", "right")),
+                TastingNote3 = str_trim(TastingNote3, side = c("both", "left", "right"))) %>% 
+         mutate(TastingNote1 = iconv(TastingNote1, to='ASCII//TRANSLIT'), 
+                TastingNote2 = iconv(TastingNote2, to='ASCII//TRANSLIT'),
+                TastingNote3 = iconv(TastingNote3, to='ASCII//TRANSLIT')) %>% 
+         mutate(row = row_number())
+        ,id.vars = 4)
+```
+
+
+```{r}
+df <- tidy_comb_all(data_quality %>% distinct(), value)
+```
+
+```{r}
+dists <- tidy_stringdist(df, v1 = V1, v2 = V2, method = c("osa", "lv", "dl",
+"hamming", "lcs", "qgram", "cosine", "jaccard", "jw", "soundex"))
+```
+
+```{r}
+dists %>% mutate(x = ifelse(cosine < .1, 1,0)) %>% summarize(n = n(),
+                                                             pos = sum(x, na.rm = TRUE),
+                                                             pct = pos/n)
+                                                             
+```
+
