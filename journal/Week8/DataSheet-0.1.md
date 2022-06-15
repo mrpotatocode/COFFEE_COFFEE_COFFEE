@@ -559,7 +559,7 @@ Rosenthal.
 ### How can the owner/curator/manager of the dataset be contacted (e.g., email address)?
 
 Thomas Rosenthal can be contacted via
-[email](t.rose.github@protonmail.com).
+[email](mailto:mrpotatocode@ttrroossee.anonaddy.com).
 
 ### Is there an erratum?
 
