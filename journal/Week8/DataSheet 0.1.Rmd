@@ -284,7 +284,7 @@ The creators of the dataset are supporting and maintaining it. The dataset is ho
 
 ### How can the owner/curator/manager of the dataset be contacted (e.g., email address)?
 
-Thomas Rosenthal can be contacted via [email](t.rose.github@protonmail.com).
+Thomas Rosenthal can be contacted via [email](mailto:mrpotatocode@ttrroossee.anonaddy.com).
 
 ###  Is there an erratum?
 
