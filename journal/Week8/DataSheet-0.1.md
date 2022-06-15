@@ -617,7 +617,7 @@ reproducibility.
 Yes, additions to this dataset would be welcome, provided they followed
 formatting and respected the intention of this dataset as exploratory,
 rather than commercial. Contact via
-[email](t.rose.github@protonmail.com) is preferred. Additions would be
+[email](mailto:twillrose@protonmail.com) is preferred. Additions would be
 incorporated via GitHub.
 
 # References
