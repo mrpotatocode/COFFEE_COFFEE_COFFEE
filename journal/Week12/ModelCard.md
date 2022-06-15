@@ -7,7 +7,7 @@ April 8, 2021
 ## Model details
 
   - Developed by Thomas Rosenthal, April 2021. Contact via
-    [email](t.rose.github@protonmail.com).
+    [email](mailto:mrpotatocode@ttrroossee.anonaddy.com).
 
   - Gradiant Boosted Tree using XGBoost. Predictors: *Variety1*,
     *Processing1*, *Country*. Outcome: *TastingGroup*.
