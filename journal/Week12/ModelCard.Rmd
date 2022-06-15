@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Model details
 
-- Developed by Thomas Rosenthal, April 2021. Contact via [email](t.rose.github@protonmail.com).
+- Developed by Thomas Rosenthal, April 2021. Contact via [email](mailto:mrpotatocode@ttrroossee.anonaddy.com).
 
 - Gradient Boosted Tree using XGBoost. Predictors: _Variety1_, _Processing1_, _Country_. Outcome: _TastingGroup_.
 
